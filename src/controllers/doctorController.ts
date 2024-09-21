@@ -1,56 +1,58 @@
+// controllers/doctorController.ts
 import { Request, Response } from 'express';
-import { doctorRepository } from '../repositories/doctorRepository';
-import bcrypt from 'bcrypt'; 
-import jwt from 'jsonwebtoken';
+import { doctorService } from '../services/doctorService';
 
 class DoctorController {
-  async signup(req: Request, res: Response): Promise<Response> {
 
+  async signup(req: Request, res: Response): Promise<Response> {
     try {
-      const { name, email, password, location, experience, gender, specialization } = req.body;      
-      const existingDoctor = await doctorRepository.findDoctorByEmail(email);
-      if (existingDoctor) {        
-        return res.status(400).json({ message: 'Doctor already exists with this email' });
-      }
-      const newDoctor = await doctorRepository.createDoctor({
+      const { name, email, password, location, experience, gender, specialization } = req.body;
+
+      const newDoctor = await doctorService.registerDoctor({
         name,
         email,
-        password, // Password will be hashed in the pre-save hook
+        password,
         location,
         experience,
-        specialization,
         gender,
+        specialization,
       });
 
-      // Return success response
-      return res.status(201).json({ message: 'Doctor registered successfully' });
-    } catch (error) {
-      return res.status(500).json({ message: 'Server error', error });
+      return res.status(201).json({ message: 'Doctor registered successfully', newDoctor });
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message });
     }
-
-    
   }
 
   async login(req: Request, res: Response): Promise<Response> {
     try {
       const { email, password } = req.body;
+      const { doctor, token } = await doctorService.loginDoctor(email, password);
 
-      const doctor = await doctorRepository.findDoctorByEmail(email);
-      if (!doctor) {
-        return res.status(400).json({ message: 'Invalid email or password' });
-      }
-      const isPasswordValid = await bcrypt.compare(password, doctor.password);
-      if (!isPasswordValid) {
-        return res.status(400).json({ message: 'Invalid email or password' });
-      }
-
-      // Generate JWT token for the doctor (assuming 'secretKey' is in your env config)
-      const token = jwt.sign({ id: doctor._id, email: doctor.email }, process.env.JWT_SECRET || 'secretKey', {
-        expiresIn: '30d', 
+      // Set the token in a cookie
+      res.cookie('token', token, {
+        httpOnly: true, // Secure the cookie
+        secure: process.env.NODE_ENV === 'production', // Only send cookie over HTTPS in production
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       });
 
-      // Return success response with token
-      return res.status(200).json({ message: 'Login successful', token });
+      // Return success response with the doctor and token
+      return res.status(200).json({ message: 'Login successful', doctor });
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message });
+    }
+  }
+
+  async logout(req: Request, res: Response): Promise<Response> {
+    try {
+      // Clear the token cookie by setting it with an expired date
+      res.cookie('token', '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        expires: new Date(0)  // Expire immediately
+      });
+
+      return res.status(200).json({ message: 'Logout successful' });
     } catch (error) {
       return res.status(500).json({ message: 'Server error', error });
     }
