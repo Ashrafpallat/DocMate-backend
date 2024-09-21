@@ -1,0 +1,57 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# dotenv environment variables file
+.env
+
+# Build files
+dist/
+build/
+.tmp/
+
+# Coverage directory used by testing tools like jest
+coverage/
+
+# Optional npm cache directory
+.npm/
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# IDE specific files
+.idea/
+.vscode/
+
+# MacOS specific files
+.DS_Store
+
+# Thumbnails or image cache
+Thumbs.db
+
+# Temporary files
+*.swp
+*.swo
+
+# Docker-related files (if using Docker)
+docker-compose.override.yml
+docker-compose.debug.yml
+
+# Ignore compiled TypeScript files (if using TypeScript)
+*.tsbuildinfo
