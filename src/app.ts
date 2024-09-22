@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import doctorRoutes from './routes/doctorRoutes';
+import patientRoutes from './routes/patientRoutes';
 import dotenv from 'dotenv';
 import cors from 'cors'
 
@@ -16,6 +17,8 @@ app.use(cors({
 app.use(express.json());  
 
 app.use('/api/doctor', doctorRoutes);
+app.use('/api/patient', patientRoutes);
+
 
 // Connect to MongoDB
 mongoose
