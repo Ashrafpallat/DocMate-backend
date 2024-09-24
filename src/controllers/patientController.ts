@@ -1,8 +1,25 @@
 // controllers/patientController.ts
 import { Request, Response } from 'express';
 import { patientService } from '../services/patientService';
+import { patientRepository } from '../repositories/patientRepository';
 
 class PatientController {
+
+  async googleAuth(req: Request, res: Response): Promise<Response> {
+    const { name, email } = req.body;
+    console.log('at patient controller');
+  
+    try {
+      // Use the repository method to find or create the patient
+      
+      const patient = await patientRepository.googleAuth(name, email);
+      
+      return res.status(200).json({ message: 'User authenticated', patient });
+    } catch (error) {
+      console.error('Error processing Google authentication:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  };
 
   async signup(req: Request, res: Response): Promise<Response> {
     try {

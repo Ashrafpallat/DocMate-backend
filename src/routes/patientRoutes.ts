@@ -13,4 +13,7 @@ router.post('/login', patientController.login.bind(patientController));
 // POST /api/patient/logout - Patient Logout
 router.post('/logout', patientController.logout.bind(patientController));
 
+// POST /api/patient/google-auth - Google Authentication
+router.post('/google-auth', patientController.googleAuth.bind(patientController));
+
 export default router;

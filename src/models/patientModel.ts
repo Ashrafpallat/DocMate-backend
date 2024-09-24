@@ -3,13 +3,13 @@ import { Schema, model } from 'mongoose';
 import { PatientDocument } from '../interfaces/patientInterface'; // Assuming you have the interface for PatientDocument
 
 const patientSchema = new Schema<PatientDocument>({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  age: { type: Number, required: true },
-  gender: { type: String, required: true },
-  location: { type: String, required: true },
+  name: { type: String, },
+  email: { type: String,  unique: true },
+  age: { type: Number, },
+  gender: { type: String, },
+  location: { type: String, },
   status: { type: String, default: 'Active' },
-  password: { type: String, required: true },
+  password: { type: String, },
   createdAt: { type: Date, default: Date.now }
 });
 
