@@ -9,5 +9,7 @@ router.post('/signup', doctorController.signup.bind(doctorController));
 router.post('/login', doctorController.login.bind(doctorController));
 // POST /api/doctor/logout - Doctor Logout
 router.post('/logout', doctorController.logout.bind(doctorController));
+// POST /api/patient/google-auth - Google Authentication
+router.post('/google-auth', doctorController.googleAuth.bind(doctorController));
 
 export default router;

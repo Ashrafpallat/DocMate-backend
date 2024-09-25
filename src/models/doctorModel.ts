@@ -3,14 +3,14 @@ import {DoctorDocument} from '../interfaces/doctorInterface'
 import bcrypt from 'bcryptjs';
 
 const doctorSchema = new Schema<DoctorDocument>({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    name: { type: String,  },
+    email: { type: String, unique: true },
+    password: { type: String,  },
     kycVerified: { type: Boolean, default: false },
-    location: { type: String, required: true },
-    experience: { type: Number, required: true },
-    specialization: {type: String, required: true},
-    gender: { type: String, required: true },
+    location: { type: String,  },
+    experience: { type: Number,  },
+    specialization: {type: String, },
+    gender: { type: String,  },
     status: { type: String, default: "active" },
 },
     { timestamps: true }
