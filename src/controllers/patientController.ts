@@ -8,45 +8,34 @@ class PatientController {
 
   async refreshAccessToken(req: Request, res: Response): Promise<Response> {
     try {
-        const { refreshToken } = req.cookies;
-        if (!refreshToken) {
-            return res.status(401).json({ message: 'No refresh token provided' });
-        }
-
-        const decoded = verifyToken(refreshToken, true); // Verify the refresh token
-
-        // Generate new access token
-        const accessToken = generateAccessToken({ patientId: decoded.patientId, email: decoded.email, name: decoded.name });
-
-        // Send the new access token
-        res.cookie('accessToken', accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV !== 'development',
-            maxAge: 15 * 60 * 1000, // 15 minutes
-            sameSite: 'none',
-            path: '/',
-        });
-
-        return res.status(200).json({ message: 'New access token issued' });
+      const { refreshToken } = req.cookies;
+      if (!refreshToken) {
+        return res.status(401).json({ message: 'No refresh token provided' });
+      }
+      const decoded = verifyToken(refreshToken, true); // Verify the refresh token
+      // Generate and set the new access token using the utility function
+      const accessToken = generateAccessToken({ patientId: decoded.patientId, email: decoded.email, name: decoded.name }, res);
+      // No need to manually set the cookie here, as it's done in the `generateAccessToken` function
+      return res.status(200).json({ message: 'New access token issued' });
     } catch (error: any) {
-        return res.status(401).json({ message: 'Invalid refresh token' });
+      return res.status(401).json({ message: 'Invalid or expired refresh token' });
     }
-}
-
+  }
 
   async googleAuth(req: Request, res: Response): Promise<Response> {
     const { name, email } = req.body;
-    console.log('at patient controller');
-
     try {
+      // Authenticate or register the user using Google credentials
       const patient = await patientRepository.googleAuth(name, email);
-
+      // Generate and set tokens (access and refresh tokens)
+      generateAccessToken({ patientId: patient._id, email: patient.email, name: patient.name }, res);
+      generateRefreshToken({ patientId: patient._id, email: patient.email, name: patient.name }, res);
       return res.status(200).json({ message: 'User authenticated', patient });
     } catch (error) {
       console.error('Error processing Google authentication:', error);
       return res.status(500).json({ message: 'Internal server error' });
     }
-  };
+  }
 
   async signup(req: Request, res: Response): Promise<Response> {
     try {
@@ -70,63 +59,47 @@ class PatientController {
 
   async login(req: Request, res: Response): Promise<Response> {
     try {
-        const { email, password } = req.body;
-        const { patient } = await patientService.loginPatient(email, password);
+      const { email, password } = req.body;
+      const { patient } = await patientService.loginPatient(email, password);
 
-        const accessToken = generateAccessToken({ patientId: patient._id, email: patient.email, name: patient.name });
-        const refreshToken = generateRefreshToken({ patientId: patient._id, email: patient.email, name: patient.name });
+      // Generate and set access and refresh tokens
+      const accessToken = generateAccessToken({ patientId: patient._id, email: patient.email, name: patient.name }, res);
+      const refreshToken = generateRefreshToken({ patientId: patient._id, email: patient.email, name: patient.name }, res);
 
-        // Set Access Token in an HTTP-only cookie
-        res.cookie('accessToken', accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV !== 'development',
-            maxAge: 15 * 60 * 1000, // 15 minutes
-            sameSite: 'none',
-            path: '/',
-        });
-
-        // Set Refresh Token in an HTTP-only cookie
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV !== 'development',
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-            sameSite: 'none',
-            path: '/',
-        });
-
-        return res.status(200).json({ message: 'Login successful', patient });
+      return res.status(200).json({ message: 'Login successful', patient });
     } catch (error: any) {
-        return res.status(400).json({ message: error.message });
+      return res.status(400).json({ message: error.message });
     }
-}
+  }
 
 
-async logout(req: Request, res: Response): Promise<Response> {
-  try {
+
+  async logout(req: Request, res: Response): Promise<Response> {
+    try {
       // Clear the access token by setting an expired date and consistent properties
       res.cookie('accessToken', '', {
-          httpOnly: true,
-          secure: process.env.NODE_ENV !== 'development',
-          expires: new Date(0), // Expire immediately
-          sameSite: 'none',
-          path: '/', // Ensure the path is the same
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development',
+        expires: new Date(0), // Expire immediately
+        sameSite: 'none',
+        path: '/', // Ensure the path is the same
       });
 
       // Clear the refresh token by setting an expired date and consistent properties
       res.cookie('refreshToken', '', {
-          httpOnly: true,
-          secure: process.env.NODE_ENV !== 'development',
-          expires: new Date(0), // Expire immediately
-          sameSite: 'none',
-          path: '/', // Ensure the path is the same
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development',
+        expires: new Date(0), // Expire immediately
+        sameSite: 'none',
+        path: '/', // Ensure the path is the same
       });
 
       console.log('Logout successful');
       return res.status(200).json({ message: 'Logout successful' });
-  } catch (error) {
+    } catch (error) {
       return res.status(500).json({ message: 'Server error', error });
+    }
   }
-}
 
 }
 

@@ -2,6 +2,8 @@
 import { Request, Response } from 'express';
 import { doctorService } from '../services/doctorService';
 import { doctorRepository } from '../repositories/doctorRepository';
+import VerificationRequest from '../models/verificationRequests';
+import cloudinary from '../config/cloudinery';
 
 class DoctorController {
 
@@ -59,7 +61,6 @@ class DoctorController {
       return res.status(400).json({ message: error.message });
     }
   }
-
   async logout(req: Request, res: Response): Promise<Response> {
     try {
       // Clear the token cookie by setting it with an expired date
@@ -73,6 +74,44 @@ class DoctorController {
     } catch (error) {
       return res.status(500).json({ message: 'Server error', error });
     }
+  }
+  async verifyDoctor(req: Request, res: Response): Promise<Response> {
+    const { name, regNo, yearOfReg, medicalCouncil } = req.body;
+    const proofFile = req.file; // Access the uploaded file from the request
+
+    if (!proofFile) {
+      return res.status(400).json({ message: 'Proof file is required' });
+    }
+
+    try {
+      // Upload the proof file to Cloudinary (or your chosen service)
+      const uploadResult = await cloudinary.v2.uploader.upload(proofFile.path);
+      const doctorId = req.user.id;
+       
+      // Create the verification data object
+      const verificationData = {
+        name,
+        regNo,
+        yearOfReg,
+        medicalCouncil,
+        proofFile: uploadResult.secure_url, // Save the URL of the uploaded file
+        doctorId
+      };
+
+      // Save verification data to the database
+      const verification = await this.saveVerificationData(verificationData);
+      
+      return res.status(201).json({ message: 'Verification request submitted successfully', verification });
+    } catch (error) {
+      console.error('Error during verification:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  async saveVerificationData(data: { name: string; regNo: string; yearOfReg: string; medicalCouncil: string; proofFile: string }) {
+    const verification = new VerificationRequest(data);
+    await verification.save();
+    return verification;
   }
 }
 

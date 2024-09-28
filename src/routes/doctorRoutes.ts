@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { doctorController } from '../controllers/doctorController';
+import { upload } from '../middleware/upload';
 
 const router = Router();
 
@@ -11,5 +12,8 @@ router.post('/login', doctorController.login.bind(doctorController));
 router.post('/logout', doctorController.logout.bind(doctorController));
 // POST /api/patient/google-auth - Google Authentication
 router.post('/google-auth', doctorController.googleAuth.bind(doctorController));
+
+router.post('/verify', upload.single('proofFile'), doctorController.verifyDoctor.bind(doctorController));
+
 
 export default router;

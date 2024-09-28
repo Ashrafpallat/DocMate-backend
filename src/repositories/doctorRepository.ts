@@ -1,4 +1,5 @@
 import { Doctor } from '../models/doctorModel';
+import VerificationRequest from '../models/verificationRequests';
 
 class DoctorRepository {
   async findDoctorByEmail(email: string) {
@@ -34,6 +35,11 @@ class DoctorRepository {
     return doctor; // Return the patient (either found or newly created)
   }
 
+  async saveVerificationData(data: { name: string; regNo: string; yearOfReg: string; medicalCouncil: string; proofFile: string }) {
+    const verification = new VerificationRequest(data);
+    await verification.save();
+    return verification;
+  }
 }
 
 
