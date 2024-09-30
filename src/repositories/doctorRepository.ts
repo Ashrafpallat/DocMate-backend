@@ -1,5 +1,5 @@
 import { Doctor } from '../models/doctorModel';
-import VerificationRequest from '../models/verificationRequests';
+import VerificationRequest from '../models/verificationModel';
 
 class DoctorRepository {
   async findDoctorByEmail(email: string) {

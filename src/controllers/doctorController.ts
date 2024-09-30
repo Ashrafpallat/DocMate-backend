@@ -2,9 +2,13 @@
 import { Request, Response } from 'express';
 import { doctorService } from '../services/doctorService';
 import { doctorRepository } from '../repositories/doctorRepository';
-import VerificationRequest from '../models/verificationRequests';
+import VerificationRequest from '../models/verificationModel';
 import cloudinary from '../config/cloudinery';
+import { generateAccessToken, generateRefreshToken } from '../utils/generateToken';
 
+interface CustomRequest extends Request{
+  user?: String | any
+}
 class DoctorController {
 
   async googleAuth(req: Request, res: Response): Promise<Response> {
@@ -46,14 +50,11 @@ class DoctorController {
   async login(req: Request, res: Response): Promise<Response> {
     try {
       const { email, password } = req.body;
-      const { doctor, token } = await doctorService.loginDoctor(email, password);
+      const { doctor } = await doctorService.loginDoctor(email, password);
 
-      // Set the token in a cookie
-      res.cookie('token', token, {
-        httpOnly: true, // Secure the cookie
-        secure: process.env.NODE_ENV === 'production', // Only send cookie over HTTPS in production
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      });
+      // Generate and set access and refresh tokens
+      const accessToken = generateAccessToken({ doctorId: doctor._id, email: doctor.email, name: doctor.name }, res);
+      const refreshToken = generateRefreshToken({ doctorId: doctor._id, email: doctor.email, name: doctor.name }, res);
 
       // Return success response with the doctor and token
       return res.status(200).json({ message: 'Login successful', doctor });
@@ -63,11 +64,21 @@ class DoctorController {
   }
   async logout(req: Request, res: Response): Promise<Response> {
     try {
-      // Clear the token cookie by setting it with an expired date
-      res.cookie('token', '', {
+      res.cookie('accessToken', '', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        expires: new Date(0)  // Expire immediately
+        secure: process.env.NODE_ENV !== 'development',
+        expires: new Date(0), // Expire immediately
+        sameSite: 'none',
+        path: '/', // Ensure the path is the same
+      });
+
+      // Clear the refresh token by setting an expired date and consistent properties
+      res.cookie('refreshToken', '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development',
+        expires: new Date(0), // Expire immediately
+        sameSite: 'none',
+        path: '/', // Ensure the path is the same
       });
 
       return res.status(200).json({ message: 'Logout successful' });
@@ -75,7 +86,7 @@ class DoctorController {
       return res.status(500).json({ message: 'Server error', error });
     }
   }
-  async verifyDoctor(req: Request, res: Response): Promise<Response> {
+  async verifyDoctor(req: CustomRequest, res: Response): Promise<Response> {
     const { name, regNo, yearOfReg, medicalCouncil } = req.body;
     const proofFile = req.file; // Access the uploaded file from the request
 
@@ -86,8 +97,8 @@ class DoctorController {
     try {
       // Upload the proof file to Cloudinary (or your chosen service)
       const uploadResult = await cloudinary.v2.uploader.upload(proofFile.path);
-      const doctorId = req.user.id;
-       
+      const doctorId = req.user.doctorId;
+        
       // Create the verification data object
       const verificationData = {
         name,

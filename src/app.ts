@@ -5,10 +5,11 @@ import patientRoutes from './routes/patientRoutes';
 import dotenv from 'dotenv';
 import cors from 'cors'
 import adminRouter from './routes/adminRoutes';
-
+import cookieParser from 'cookie-parser';
 dotenv.config();
 
 const app = express();
+app.use(cookieParser());
 
 app.use(cors({
   origin: 'http://localhost:5173', // Replace with your frontend URL
