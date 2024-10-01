@@ -13,7 +13,6 @@ class DoctorController {
 
   async googleAuth(req: Request, res: Response): Promise<Response> {
     const { name, email } = req.body;
-    console.log('at doctor controller');
   
     try {
       // Use the repository method to find or create the doctor
