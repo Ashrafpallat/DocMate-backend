@@ -10,6 +10,8 @@ export interface DoctorDocument extends Document {
   specialization: string;
   gender: string;
   status: string;
+  age: number,
+  fees: number,
   createdAt: Date;
   updatedAt: Date;
 }

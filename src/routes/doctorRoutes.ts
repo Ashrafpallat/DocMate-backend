@@ -16,5 +16,8 @@ router.post('/google-auth', doctorController.googleAuth.bind(doctorController));
 
 router.post('/verify',authMiddleware, upload.single('proofFile'), doctorController.verifyDoctor.bind(doctorController));
 
-
+router.get('/profile',authMiddleware, doctorController.getProfile.bind(doctorController))
+router.post('/profile',authMiddleware, doctorController.updateProfile.bind(doctorController))
+ 
+ 
 export default router;

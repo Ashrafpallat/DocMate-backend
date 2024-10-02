@@ -5,6 +5,9 @@ class DoctorRepository {
   async findDoctorByEmail(email: string) {
     return await Doctor.findOne({ email });
   }
+  async findDoctorbyId(id: string){
+    return await Doctor.findById(id)
+  }
 
   async createDoctor(doctorData: any) {
     const doctor = new Doctor(doctorData);
@@ -39,6 +42,9 @@ class DoctorRepository {
     const verification = new VerificationRequest(data);
     await verification.save();
     return verification;
+  }
+  async updateDoctorProfile(doctorId: string, updatedData: any) {
+    return await Doctor.findByIdAndUpdate(doctorId, updatedData, { new: true });
   }
 }
 

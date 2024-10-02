@@ -7,9 +7,7 @@ interface CustomRequest extends Request{
 }
 
 const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunction) => {
-// const authMiddleware = async (req, res, next) => {
-    console.log('req.cookies', req.cookies);
-    
+// const authMiddleware = async (req, res, next) => {    
     let token = req.cookies.accessToken;
 
     if (!token) {
@@ -23,8 +21,6 @@ const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunct
         try {
             // Verify the refresh token
             const decodedRefreshToken = verifyToken(refreshToken, true); // true indicates it's a refresh token
-            console.log('Refresh token decoded:', decodedRefreshToken);
-
             // Generate a new access token
             token = generateAccessToken({
                 doctorId: decodedRefreshToken.doctorId, // You might have different payload data
@@ -45,8 +41,6 @@ const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunct
     try {
         // Verify the access token (new or existing)
         const decoded: any = verifyToken(token);
-        console.log('Access token decoded:', decoded);
-
         // Attach the decoded token payload to the request
         req.user = decoded
 

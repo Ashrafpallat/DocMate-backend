@@ -6,19 +6,19 @@ import VerificationRequest from '../models/verificationModel';
 import cloudinary from '../config/cloudinery';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateToken';
 
-interface CustomRequest extends Request{
+interface CustomRequest extends Request {
   user?: String | any
 }
 class DoctorController {
 
   async googleAuth(req: Request, res: Response): Promise<Response> {
     const { name, email } = req.body;
-  
+
     try {
       // Use the repository method to find or create the doctor
-      
+
       const doctor = await doctorRepository.googleAuth(name, email);
-      
+
       return res.status(200).json({ message: 'User authenticated', doctor });
     } catch (error) {
       console.error('Error processing Google authentication:', error);
@@ -97,7 +97,7 @@ class DoctorController {
       // Upload the proof file to Cloudinary (or your chosen service)
       const uploadResult = await cloudinary.v2.uploader.upload(proofFile.path);
       const doctorId = req.user.doctorId;
-        
+
       // Create the verification data object
       const verificationData = {
         name,
@@ -110,7 +110,7 @@ class DoctorController {
 
       // Save verification data to the database
       const verification = await this.saveVerificationData(verificationData);
-      
+
       return res.status(201).json({ message: 'Verification request submitted successfully', verification });
     } catch (error) {
       console.error('Error during verification:', error);
@@ -122,6 +122,52 @@ class DoctorController {
     const verification = new VerificationRequest(data);
     await verification.save();
     return verification;
+  }
+  async getProfile(req: CustomRequest, res: Response): Promise<Response> {
+    try {
+      const doctorId = req.user?.doctorId;
+
+      const doctor = await doctorRepository.findDoctorbyId(doctorId)
+      if (!doctor) {
+        return res.status(404).json({ message: 'Doctor not found' });
+      }
+
+      return res.status(200).json(doctor);
+    } catch (error) {
+      console.error('Error fetching doctor profile:', error);
+      // Return 500 if there is a server error
+      return res.status(500).json({ message: 'Server error' });
+    }
+  }
+  async updateProfile(req: CustomRequest, res: Response): Promise<Response> {
+    try {
+      const doctorId = req.user?.doctorId; // Assuming req.user has the authenticated doctorId
+
+      // Fetch the doctor's current profile
+      const doctor = await doctorRepository.findDoctorbyId(doctorId);
+
+      if (!doctor) {
+        return res.status(404).json({ message: 'Doctor not found' });
+      }
+
+      // Update the doctor's profile with the incoming data
+      const updatedData = {
+        name: req.body.name || doctor.name,
+        email: req.body.email || doctor.email,
+        age: req.body.age || doctor.age,
+        specialization: req.body.specialization || doctor.specialization,
+        fees: req.body.fees || doctor.fees,
+        location: req.body.location || doctor.location,
+      };
+
+      // Update doctor details in the repository
+      const updatedDoctor = await doctorRepository.updateDoctorProfile(doctorId, updatedData);
+
+      return res.status(200).json(updatedDoctor);
+    } catch (error) {
+      console.error('Error updating doctor profile:', error);
+      return res.status(500).json({ message: 'Server error' });
+    }
   }
 }
 
