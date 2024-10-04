@@ -13,6 +13,7 @@ const doctorSchema = new Schema<DoctorDocument>({
   gender: { type: String, },
   age: { type: Number },
   fees: { type: Number },
+  profilePhoto: {type: String},
   status: { type: String, default: "active" },
 },
   { timestamps: true }

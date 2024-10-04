@@ -12,6 +12,7 @@ export interface DoctorDocument extends Document {
   status: string;
   age: number,
   fees: number,
+  profilePhoto: any,
   createdAt: Date;
   updatedAt: Date;
 }

@@ -86,6 +86,8 @@ class DoctorController {
     }
   }
   async verifyDoctor(req: CustomRequest, res: Response): Promise<Response> {
+    console.log('verify server body', req.file);
+    
     const { name, regNo, yearOfReg, medicalCouncil } = req.body;
     const proofFile = req.file; // Access the uploaded file from the request
 
@@ -141,16 +143,18 @@ class DoctorController {
   }
   async updateProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
-      const doctorId = req.user?.doctorId; // Assuming req.user has the authenticated doctorId
-
-      // Fetch the doctor's current profile
-      const doctor = await doctorRepository.findDoctorbyId(doctorId);
-
+      console.log('update profile',req.file);
+      
+      const doctorId = req.user?.doctorId; // Assuming req.user has the authenticated doctorI      
+      const doctor = await doctorRepository.findDoctorbyId(doctorId);      
       if (!doctor) {
         return res.status(404).json({ message: 'Doctor not found' });
-      }
+      }      
+      let profilePhoto = req.file ? req.file.path : doctor.profilePhoto
+      console.log('profilephoto',profilePhoto);
+      
+      const uploadResult = await cloudinary.v2.uploader.upload(profilePhoto);
 
-      // Update the doctor's profile with the incoming data
       const updatedData = {
         name: req.body.name || doctor.name,
         email: req.body.email || doctor.email,
@@ -158,6 +162,7 @@ class DoctorController {
         specialization: req.body.specialization || doctor.specialization,
         fees: req.body.fees || doctor.fees,
         location: req.body.location || doctor.location,
+        profilePhoto: uploadResult.secure_url || doctor.profilePhoto || ''
       };
 
       // Update doctor details in the repository
