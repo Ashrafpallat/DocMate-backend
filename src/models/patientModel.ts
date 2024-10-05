@@ -9,6 +9,7 @@ const patientSchema = new Schema<PatientDocument>({
   gender: { type: String, },
   location: { type: String, },
   status: { type: String, default: 'Active' },
+  profilePhoto: {type: String},
   password: { type: String, },
   createdAt: { type: Date, default: Date.now }
 });

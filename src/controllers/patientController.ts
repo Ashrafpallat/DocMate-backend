@@ -3,7 +3,11 @@ import { Request, Response } from 'express';
 import { patientService } from '../services/patientService';
 import { patientRepository } from '../repositories/patientRepository';
 import { generateAccessToken, generateRefreshToken, verifyToken } from '../utils/generateToken';
+import cloudinary from '../config/cloudinery';
 
+interface CustomRequest extends Request {
+  user?: String | any
+}
 class PatientController {
 
   async refreshAccessToken(req: Request, res: Response): Promise<Response> {
@@ -69,6 +73,54 @@ class PatientController {
       return res.status(200).json({ message: 'Login successful', patient });
     } catch (error: any) {
       return res.status(400).json({ message: error.message });
+    }
+  }
+
+  async getProfile(req: CustomRequest, res: Response): Promise<Response> {
+    try {
+      const patientId = req.user?.patientId;
+
+      const patient = await patientRepository.findPatientById(patientId)
+      if (!patient) {
+        return res.status(404).json({ message: 'patient not found' });
+      }
+
+      return res.status(200).json(patient);
+    } catch (error) {
+      console.error('Error fetching patient profile:', error);
+      // Return 500 if there is a server error
+      return res.status(500).json({ message: 'Server error' });
+    }
+  }
+  async updateProfile(req: CustomRequest, res: Response): Promise<Response> {
+    try {
+      console.log('update profile',req.file);
+      
+      const patientId = req.user?.patientId; // Assuming req.user has the authenticated doctorI      
+      const patient = await patientRepository.findPatientById(patientId);      
+      if (!patient) {
+        return res.status(404).json({ message: 'patient not found' });
+      }      
+      let profilePhoto = req.file ? req.file.path : patient.profilePhoto
+      console.log('profilephoto',profilePhoto);
+      
+      const uploadResult = await cloudinary.v2.uploader.upload(profilePhoto);
+
+      const updatedData = {
+        name: req.body.name || patient.name,
+        email: req.body.email || patient.email,
+        age: req.body.age || patient.age,
+        location: req.body.location || patient.location,
+        profilePhoto: uploadResult.secure_url || patient.profilePhoto || ''
+      };
+
+      // Update doctor details in the repository
+      const updatedDoctor = await patientRepository.updatePatientProfile(patientId, updatedData);
+
+      return res.status(200).json(updatedDoctor);
+    } catch (error) {
+      console.error('Error updating doctor profile:', error);
+      return res.status(500).json({ message: 'Server error' });
     }
   }
 

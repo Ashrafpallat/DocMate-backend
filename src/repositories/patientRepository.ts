@@ -45,6 +45,9 @@ class PatientRepository {
     console.log(' user exists');
     return patient; // Return the patient (either found or newly created)
   }
+  async updatePatientProfile(patientId: string, updatedData: any) {
+    return await Patient.findByIdAndUpdate(patientId, updatedData, { new: true });
+  }
 }
 
 export const patientRepository = new PatientRepository();

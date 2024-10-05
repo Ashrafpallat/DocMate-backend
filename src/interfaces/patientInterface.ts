@@ -8,6 +8,7 @@ export interface PatientDocument extends Document {
   gender: 'Male' | 'Female' | 'Other';
   location: string;
   status: 'Active' | 'Blocked';
+  profilePhoto: string,
   password: string;
   createdAt: Date;
   updatedAt: Date;
