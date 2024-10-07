@@ -18,6 +18,6 @@ router.post('/verify',authMiddleware, upload.single('proofFile'), doctorControll
  
 router.get('/profile',authMiddleware, doctorController.getProfile.bind(doctorController))
 router.post('/profile',authMiddleware,upload.single('profilePhoto'), doctorController.updateProfile.bind(doctorController))
- 
+
  
 export default router;
