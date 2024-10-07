@@ -162,6 +162,8 @@ class DoctorController {
         specialization: req.body.specialization || doctor.specialization,
         fees: req.body.fees || doctor.fees,
         location: req.body.location || doctor.location,
+        latitude: req.body.latitude || doctor.latitude || '',
+        longitude: req.body.longitude || doctor.longitude || '',
         profilePhoto: uploadResult.secure_url || doctor.profilePhoto || ''
       };
 

@@ -8,6 +8,8 @@ const doctorSchema = new Schema<DoctorDocument>({
   password: { type: String, },
   kycVerified: { type: Boolean, default: false },
   location: { type: String, },
+  latitude: {type: String},
+  longitude: {type: String},
   experience: { type: Number, },
   specialization: { type: String, },
   gender: { type: String, },
@@ -18,7 +20,7 @@ const doctorSchema = new Schema<DoctorDocument>({
 },
   { timestamps: true }
 )
-
+ 
 doctorSchema.pre('save', async function (next) {
   const doctor = this as DoctorDocument;
 

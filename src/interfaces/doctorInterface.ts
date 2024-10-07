@@ -6,6 +6,8 @@ export interface DoctorDocument extends Document {
   password: string;
   kycVerified: boolean;
   location: string;
+  latitude: string
+  longitude: string
   experience: number;
   specialization: string;
   gender: string;
