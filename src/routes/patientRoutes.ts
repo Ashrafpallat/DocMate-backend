@@ -18,8 +18,14 @@ router.post('/logout', patientController.logout.bind(patientController));
 // POST /api/patient/google-auth - Google Authentication
 router.post('/google-auth', patientController.googleAuth.bind(patientController));
 
-router.get('/profile',authMiddleware, patientController.getProfile.bind(patientController))
-router.post('/profile',authMiddleware,upload.single('profilePhoto'), patientController.updateProfile.bind(patientController))
+// GET /api/patient/profile - Get patient profile
+router.get('/profile', authMiddleware, patientController.getProfile.bind(patientController));
 
+// POST /api/patient/profile - Update patient profile
+router.post('/profile', authMiddleware, upload.single('profilePhoto'), patientController.updateProfile.bind(patientController));
+
+// GET /api/patient/nearby-doctors - Get nearby doctors
+router.get('/nearby-doctors', authMiddleware, patientController.getDoctorsNearby.bind(patientController));
 
 export default router;
+ 

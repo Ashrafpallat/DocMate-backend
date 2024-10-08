@@ -1,3 +1,4 @@
+import { Doctor } from '../models/doctorModel';
 import { Patient } from '../models/patientModel';
 
 class PatientRepository {
@@ -26,28 +27,42 @@ class PatientRepository {
   async googleAuth(name: string, email: string) {
     // Check if the patient already exists
     let patient = await this.findPatientByEmail(email);
-    
+
     // If not, create a new patient
     if (!patient) {
       const newPatientData = {
         name,
         email,
-        age:'',
-        gender:'',
-        password:'',
+        age: '',
+        gender: '',
+        password: '',
         // Include any other default fields you want to set
       };
       patient = await this.createPatient(newPatientData);
       console.log('user created');
-      
+
     }
-    
+
     console.log(' user exists');
     return patient; // Return the patient (either found or newly created)
   }
   async updatePatientProfile(patientId: string, updatedData: any) {
     return await Patient.findByIdAndUpdate(patientId, updatedData, { new: true });
   }
+  async findDoctorsNearby(lat: number, lng: number) {
+    return Doctor.find({
+      location: {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [lng, lat], // MongoDB expects coordinates in [longitude, latitude] order
+          },
+          $maxDistance: 10000, // Set the maximum distance in meters (10 km in this case)
+        },
+      },
+    });
+  }
 }
+
 
 export const patientRepository = new PatientRepository();

@@ -18,7 +18,10 @@ class DoctorController {
       // Use the repository method to find or create the doctor
 
       const doctor = await doctorRepository.googleAuth(name, email);
-
+      const accessToken = generateAccessToken({ doctorId: doctor._id, email: doctor.email, name: doctor.name }, res);
+      const refreshToken = generateRefreshToken({ doctorId: doctor._id, email: doctor.email, name: doctor.name }, res);
+      console.log('tokens created', accessToken, refreshToken);
+      
       return res.status(200).json({ message: 'User authenticated', doctor });
     } catch (error) {
       console.error('Error processing Google authentication:', error);
@@ -161,9 +164,14 @@ class DoctorController {
         age: req.body.age || doctor.age,
         specialization: req.body.specialization || doctor.specialization,
         fees: req.body.fees || doctor.fees,
-        location: req.body.location || doctor.location,
-        latitude: req.body.latitude || doctor.latitude || '',
-        longitude: req.body.longitude || doctor.longitude || '',
+        locationName: req.body.location || doctor.locationName,
+        location: {
+          type: 'Point',
+          coordinates: [
+            parseFloat(req.body.longitude) || doctor.location?.coordinates[0], // Longitude
+            parseFloat(req.body.latitude) || doctor.location?.coordinates[1]  // Latitude
+          ],
+        },
         profilePhoto: uploadResult.secure_url || doctor.profilePhoto || ''
       };
 

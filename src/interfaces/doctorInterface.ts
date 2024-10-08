@@ -1,20 +1,20 @@
-import { Document } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface DoctorDocument extends Document {
   name: string;
   email: string;
   password: string;
   kycVerified: boolean;
-  location: string;
-  latitude: string
-  longitude: string
+  locationName: string
+  location: {
+    type: string;
+    coordinates: [number, number]; // Array of numbers: [longitude, latitude]
+  };
   experience: number;
   specialization: string;
   gender: string;
+  age: number;
+  fees: number;
+  profilePhoto: string;
   status: string;
-  age: number,
-  fees: number,
-  profilePhoto: any,
-  createdAt: Date;
-  updatedAt: Date;
 }

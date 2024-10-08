@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import cors from 'cors'
 import adminRouter from './routes/adminRoutes';
 import cookieParser from 'cookie-parser';
+import { Doctor } from './models/doctorModel';
 dotenv.config();
 
 const app = express();
@@ -30,6 +31,13 @@ mongoose
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log('MongoDB connection error', err));
 
+  // Create the index (this will create the index on the existing documents)
+Doctor.init().then(() => {
+  console.log('Geospatial index created!');
+}).catch(err => {
+  console.error('Error creating index:', err);
+});
+ 
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

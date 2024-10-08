@@ -1,26 +1,37 @@
-import { Schema, model, Document } from 'mongoose'
-import { DoctorDocument } from '../interfaces/doctorInterface'
+import { Schema, model, Document } from 'mongoose';
+import { DoctorDocument } from '../interfaces/doctorInterface';
 import bcrypt from 'bcryptjs';
 
-const doctorSchema = new Schema<DoctorDocument>({
-  name: { type: String, },
-  email: { type: String, unique: true },
-  password: { type: String, },
-  kycVerified: { type: Boolean, default: false },
-  location: { type: String, },
-  latitude: {type: String},
-  longitude: {type: String},
-  experience: { type: Number, },
-  specialization: { type: String, },
-  gender: { type: String, },
-  age: { type: Number },
-  fees: { type: Number },
-  profilePhoto: {type: String},
-  status: { type: String, default: "active" },
-},
+const doctorSchema = new Schema<DoctorDocument>(
+  {
+    name: { type: String },
+    email: { type: String, unique: true },
+    password: { type: String },
+    kycVerified: { type: Boolean, default: false },
+    locationName: { type: String },
+    location: {
+      type: {
+        type: String, // 'Point'
+        enum: ['Point'], // Must be 'Point'
+      },
+      coordinates: {
+        type: [Number], // Array of numbers: [longitude, latitude]
+      },
+    },
+    experience: { type: Number },
+    specialization: { type: String },
+    gender: { type: String },
+    age: { type: Number },
+    fees: { type: Number },
+    profilePhoto: { type: String },
+    status: { type: String, default: 'active' },
+  },
   { timestamps: true }
-)
- 
+);
+
+// Create a geospatial index on the location field
+doctorSchema.index({ location: '2dsphere' }); // Index for geospatial queries
+
 doctorSchema.pre('save', async function (next) {
   const doctor = this as DoctorDocument;
 
