@@ -21,7 +21,7 @@ class DoctorController {
       const accessToken = generateAccessToken({ doctorId: doctor._id, email: doctor.email, name: doctor.name }, res);
       const refreshToken = generateRefreshToken({ doctorId: doctor._id, email: doctor.email, name: doctor.name }, res);
       console.log('tokens created', accessToken, refreshToken);
-      
+
       return res.status(200).json({ message: 'User authenticated', doctor });
     } catch (error) {
       console.error('Error processing Google authentication:', error);
@@ -31,23 +31,45 @@ class DoctorController {
 
   async signup(req: Request, res: Response): Promise<Response> {
     try {
-      const { name, email, password, location, experience, gender, specialization } = req.body;
+      const {
+        name,
+        email,
+        password,
+        locationName,
+        latitude,
+        longitude,
+        experience,
+        gender,
+        specialization,
+      } = req.body;
 
+      // Create the location object in the format required by MongoDB's GeoJSON schema
+      const location = {
+        type: 'Point',
+        coordinates: [parseFloat(longitude), parseFloat(latitude)] // [longitude, latitude]
+      };
+
+      // Call the doctor service to register a new doctor
       const newDoctor = await doctorService.registerDoctor({
         name,
         email,
         password,
-        location,
+        locationName,
+        location, // Pass the location object
         experience,
         gender,
         specialization,
       });
 
-      return res.status(201).json({ message: 'Doctor registered successfully', newDoctor });
-    } catch (error: any) {
-      return res.status(400).json({ message: error.message });
+      return res.status(201).json({
+        message: 'Doctor registered successfully',
+        doctor: newDoctor,
+      });
+    } catch (error) {
+      console.log('error occured during signup', error);
+      return res.status(400).json({ message: 'Internal server error' });
     }
-  }
+  };
 
   async login(req: Request, res: Response): Promise<Response> {
     try {
@@ -90,7 +112,7 @@ class DoctorController {
   }
   async verifyDoctor(req: CustomRequest, res: Response): Promise<Response> {
     console.log('verify server body', req.file);
-    
+
     const { name, regNo, yearOfReg, medicalCouncil } = req.body;
     const proofFile = req.file; // Access the uploaded file from the request
 
@@ -146,16 +168,16 @@ class DoctorController {
   }
   async updateProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
-      console.log('update profile',req.file);
-      
+      console.log('update profile', req.file);
+
       const doctorId = req.user?.doctorId; // Assuming req.user has the authenticated doctorI      
-      const doctor = await doctorRepository.findDoctorbyId(doctorId);      
+      const doctor = await doctorRepository.findDoctorbyId(doctorId);
       if (!doctor) {
         return res.status(404).json({ message: 'Doctor not found' });
-      }      
+      }
       let profilePhoto = req.file ? req.file.path : doctor.profilePhoto
-      console.log('profilephoto',profilePhoto);
-      
+      console.log('profilephoto', profilePhoto);
+
       const uploadResult = await cloudinary.v2.uploader.upload(profilePhoto);
 
       const updatedData = {
