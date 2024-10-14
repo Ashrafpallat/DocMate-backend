@@ -206,6 +206,24 @@ class DoctorController {
       return res.status(500).json({ message: 'Server error' });
     }
   }
+
+  async saveDefaultTokens(req: Request, res: Response): Promise<Response> {
+    try {
+      const { selectedDay, slots } = req.body;  // 'day' is the day of the week, 'tokens' is an array of time slots
+
+      // Call the service to save default tokens
+      const defaultTokens = await doctorService.saveDefaultTokens(selectedDay, slots);
+
+      return res.status(200).json({
+        message: `Default tokens for ${selectedDay} saved successfully`,
+        defaultTokens
+      });
+    } catch (error) {
+      console.error('Error saving default tokens:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
 }
 
 export const doctorController = new DoctorController();

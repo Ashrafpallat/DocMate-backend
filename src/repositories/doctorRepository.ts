@@ -1,3 +1,4 @@
+import { DefaultToken, DefaultTokenModel } from '../models/defaultTokenModel';
 import { Doctor } from '../models/doctorModel';
 import VerificationRequest from '../models/verificationModel';
 
@@ -45,6 +46,21 @@ class DoctorRepository {
   }
   async updateDoctorProfile(doctorId: string, updatedData: any) {
     return await Doctor.findByIdAndUpdate(doctorId, updatedData, { new: true });
+  }
+  
+  async findDefaultTokensByDay(day: string): Promise<DefaultToken | null> {
+    return await DefaultTokenModel.findOne({ day });
+  }
+  // Save or update default tokens
+  async saveOrUpdateDefaultTokens(day: string, tokens: any[]): Promise<DefaultToken> {
+    let defaultTokens = await this.findDefaultTokensByDay(day);
+    
+    if (defaultTokens) {
+      defaultTokens.slots = tokens;  // Update existing tokens
+    } else {
+      defaultTokens = new DefaultTokenModel({ day, tokens }); // Create new
+    }
+    return await defaultTokens.save();
   }
 }
 

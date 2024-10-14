@@ -37,4 +37,12 @@ export const doctorService = {
 
     return { doctor, token };
   },
+
+  async saveDefaultTokens(day: string, tokens: any[]): Promise<any> {
+    // Any business logic can be added here (validation, etc.)
+    
+    // Call the repository to save or update the tokens
+    const savedTokens = await doctorRepository.saveOrUpdateDefaultTokens(day, tokens);
+    return savedTokens;
+  }
 };
