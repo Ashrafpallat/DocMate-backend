@@ -207,12 +207,12 @@ class DoctorController {
     }
   }
 
-  async saveDefaultTokens(req: Request, res: Response): Promise<Response> {
+  async saveDefaultTokens(req: CustomRequest, res: Response): Promise<Response> {
     try {
-      const { selectedDay, slots } = req.body;  // 'day' is the day of the week, 'tokens' is an array of time slots
+      const { selectedDay, slots } = req.body;
+      const doctorId = req.user?.doctorId; // Assuming req.user has the authenticated doctorI      
 
-      // Call the service to save default tokens
-      const defaultTokens = await doctorService.saveDefaultTokens(selectedDay, slots);
+      const defaultTokens = await doctorService.saveDefaultTokens(selectedDay, slots, doctorId);
 
       return res.status(200).json({
         message: `Default tokens for ${selectedDay} saved successfully`,
@@ -223,6 +223,16 @@ class DoctorController {
       return res.status(500).json({ message: 'Internal server error' });
     }
   }
+   async getDoctorSlots(req: Request, res: Response): Promise<void>{
+    try {      
+      const { doctorId } = req.params; 
+      const slots = await doctorService.getDoctorSlots(doctorId);       
+      res.status(200).json( slots );
+    } catch (error) {
+      console.error('Error fetching slots:', error);
+      res.status(500).json({ message: error || 'Server error. Could not fetch slots.' });
+    }
+  };
 
 }
 

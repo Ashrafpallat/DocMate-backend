@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { doctorRepository } from '../repositories/doctorRepository';
+import { DefaultToken } from '../models/defaultTokenModel';
 
 export const doctorService = {
   async registerDoctor(doctorData: any) {
@@ -38,11 +39,20 @@ export const doctorService = {
     return { doctor, token };
   },
 
-  async saveDefaultTokens(day: string, tokens: any[]): Promise<any> {
+  async saveDefaultTokens(day: string, tokens: any[], doctorId: string): Promise<any> {
     // Any business logic can be added here (validation, etc.)
-    
-    // Call the repository to save or update the tokens
-    const savedTokens = await doctorRepository.saveOrUpdateDefaultTokens(day, tokens);
+
+    const savedTokens = await doctorRepository.saveOrUpdateDefaultTokens(day, tokens, doctorId);
     return savedTokens;
+  },
+
+  async getDoctorSlots(doctorId: string): Promise<DefaultToken[]> {
+    try {
+      return await doctorRepository.findSlotsByDoctorId(doctorId);
+      // return slots.length > 0 ? slots : [];
+    } catch (error) {
+      console.error('Error in doctor service:', error);
+      throw error;
+    }
   }
 };

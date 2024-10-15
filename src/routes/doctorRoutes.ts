@@ -15,10 +15,11 @@ router.post('/logout', doctorController.logout.bind(doctorController));
 router.post('/google-auth', doctorController.googleAuth.bind(doctorController));
 
 router.post('/verify',authMiddleware, upload.single('proofFile'), doctorController.verifyDoctor.bind(doctorController));
- 
+
 router.get('/profile',authMiddleware, doctorController.getProfile.bind(doctorController))
 router.post('/profile',authMiddleware,upload.single('profilePhoto'), doctorController.updateProfile.bind(doctorController))
 router.post('/save-slots', authMiddleware, doctorController.saveDefaultTokens.bind(doctorController))
+router.get('/:doctorId/slots', authMiddleware, doctorController.getDoctorSlots.bind(doctorController))
 
   
 export default router;
