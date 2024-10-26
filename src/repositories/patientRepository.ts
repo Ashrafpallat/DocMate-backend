@@ -49,20 +49,43 @@ class PatientRepository {
   async updatePatientProfile(patientId: string, updatedData: any) {
     return await Patient.findByIdAndUpdate(patientId, updatedData, { new: true });
   }
-  async findDoctorsNearby(lat: number, lng: number) {
-    return Doctor.find({
+  async findDoctorsNearby(lat: number, lng: number, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    console.log('at repo');
+
+    const totalDoctors = await Doctor.find({
       location: {
         $near: {
           $geometry: {
             type: 'Point',
-            coordinates: [lng, lat], 
+            coordinates: [lng, lat],
           },
-          $maxDistance: 10000, // Set the maximum distance in meters (10 km in this case)
+          $maxDistance: 10000, // Set the maximum distance in meters (10 km)
         },
       },
       kycVerified: true,
-    });
+    })
+    let totalCount=totalDoctors.length
+
+    const doctors = await Doctor.find({
+      location: {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [lng, lat],
+          },
+          $maxDistance: 10000, // Set the maximum distance in meters (10 km)
+        },
+      },
+      kycVerified: true,
+    })
+      .skip(skip) // Skip the documents of previous pages
+      .limit(limit) // Limit the number of documents per page
+      .exec(); // Execute the query  
+    return {doctors, totalCount};
   }
+
+
 }
 
 

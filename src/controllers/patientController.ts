@@ -128,7 +128,9 @@ class PatientController {
   }
   async getDoctorsNearby(req: Request, res: Response): Promise<Response> {
     try {
-      const { lat, lng } = req.query; // Extract latitude and longitude from query params
+      console.log(req.query);
+      
+      const { lat, lng, page = 1, limit = 3 } = req.query; // Default to page 1 and limit 3
       if (!lat || !lng) {
         return res.status(400).json({ message: 'Latitude and longitude are required' });
       }
@@ -137,13 +139,21 @@ class PatientController {
       if (isNaN(latitude) || isNaN(longitude)) {
         return res.status(400).json({ message: 'Invalid latitude or longitude' });
       }
-      const doctors = await patientRepository.findDoctorsNearby(latitude, longitude);
-      return res.status(200).json(doctors);
+  
+      // Convert page and limit to numbers
+      const pageNum = parseInt(page as string, 10);
+      const limitNum = parseInt(limit as string, 10);
+      
+      const {doctors,totalCount} = await patientRepository.findDoctorsNearby(latitude, longitude, pageNum, limitNum);
+      console.log('doctors at cotnrolr', doctors, totalCount);
+      
+      return res.status(200).json({doctors,totalCount});
     } catch (error) {
       console.error('Error fetching nearby doctors:', error);
       return res.status(500).json({ message: 'Server error' });
     }
   }
+  
 
 
 
