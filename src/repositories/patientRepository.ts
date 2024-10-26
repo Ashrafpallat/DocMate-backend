@@ -55,11 +55,12 @@ class PatientRepository {
         $near: {
           $geometry: {
             type: 'Point',
-            coordinates: [lng, lat], // MongoDB expects coordinates in [longitude, latitude] order
+            coordinates: [lng, lat], 
           },
           $maxDistance: 10000, // Set the maximum distance in meters (10 km in this case)
         },
       },
+      kycVerified: true,
     });
   }
 }
