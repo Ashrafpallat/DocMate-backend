@@ -111,8 +111,6 @@ class DoctorController {
     }
   }
   async verifyDoctor(req: CustomRequest, res: Response): Promise<Response> {
-    console.log('verify server body', req.file);
-
     const { name, regNo, yearOfReg, medicalCouncil } = req.body;
     const proofFile = req.file; // Access the uploaded file from the request
 
@@ -146,14 +144,17 @@ class DoctorController {
   }
 
   async saveVerificationData(data: { name: string; regNo: string; yearOfReg: string; medicalCouncil: string; proofFile: string }) {
-    const verification = new VerificationRequest(data);
-    await verification.save();
-    return verification;
+    try {
+      const verification = new VerificationRequest(data);
+      await verification.save();
+      return verification;
+    } catch (error) {
+      console.log('Error at controller', error);
+    }
   }
   async getProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const doctorId = req.user?.doctorId;
-
       const doctor = await doctorRepository.findDoctorbyId(doctorId)
       if (!doctor) {
         return res.status(404).json({ message: 'Doctor not found' });
@@ -223,11 +224,11 @@ class DoctorController {
       return res.status(500).json({ message: 'Internal server error' });
     }
   }
-   async getDoctorSlots(req: Request, res: Response): Promise<void>{
-    try {      
-      const { doctorId } = req.params; 
-      const slots = await doctorService.getDoctorSlots(doctorId);       
-      res.status(200).json( slots );
+  async getDoctorSlots(req: Request, res: Response): Promise<void> {
+    try {
+      const { doctorId } = req.params;
+      const slots = await doctorService.getDoctorSlots(doctorId);
+      res.status(200).json(slots);
     } catch (error) {
       console.error('Error fetching slots:', error);
       res.status(500).json({ message: error || 'Server error. Could not fetch slots.' });
