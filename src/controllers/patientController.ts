@@ -39,7 +39,7 @@ class PatientController {
       console.error('Error processing Google authentication:', error);
       return res.status(500).json({ message: 'Internal server error' });
     }
-  }
+  } 
 
   async signup(req: Request, res: Response): Promise<Response> {
     try {
@@ -79,9 +79,12 @@ class PatientController {
   async getProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const patientId = req.user?.patientId;
+      console.log(patientId);
+      
 
       const patient = await patientRepository.findPatientById(patientId)
       if (!patient) {
+        console.log('patient not found');
         return res.status(404).json({ message: 'patient not found' });
       }
 

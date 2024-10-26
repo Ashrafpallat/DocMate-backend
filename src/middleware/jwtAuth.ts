@@ -7,7 +7,6 @@ interface CustomRequest extends Request{
 }
 
 const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunction) => {
-// const authMiddleware = async (req, res, next) => {    
     let token = req.cookies.accessToken;
 
     if (!token) {

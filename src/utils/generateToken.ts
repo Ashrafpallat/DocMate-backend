@@ -4,7 +4,6 @@ import { Response } from 'express';
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'fallback-refresh-secret';
 
-// Generate Access Token and Set Cookie
 export const generateAccessToken = (payload: object, res: Response): string => {
     const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' }); // Short-lived access token
     // Set the access token as an HTTP-only cookie
