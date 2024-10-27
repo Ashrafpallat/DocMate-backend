@@ -144,9 +144,7 @@ class PatientController {
       const pageNum = parseInt(page as string, 10);
       const limitNum = parseInt(limit as string, 10);
       
-      const {doctors,totalCount} = await patientRepository.findDoctorsNearby(latitude, longitude, pageNum, limitNum);
-      console.log('doctors at cotnrolr', doctors, totalCount);
-      
+      const {doctors,totalCount} = await patientRepository.findDoctorsNearby(latitude, longitude, pageNum, limitNum);      
       return res.status(200).json({doctors,totalCount});
     } catch (error) {
       console.error('Error fetching nearby doctors:', error);
