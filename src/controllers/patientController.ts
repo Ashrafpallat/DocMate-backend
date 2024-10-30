@@ -4,10 +4,19 @@ import { patientService } from '../services/patientService';
 import { patientRepository } from '../repositories/patientRepository';
 import { generateAccessToken, generateRefreshToken, verifyToken } from '../utils/generateToken';
 import cloudinary from '../config/cloudinery';
+import Stripe from 'stripe';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 interface CustomRequest extends Request {
   user?: String | any
 }
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-09-30.acacia',
+});
+
 class PatientController {
 
   async refreshAccessToken(req: Request, res: Response): Promise<Response> {
@@ -179,6 +188,52 @@ class PatientController {
       return res.status(200).json({ message: 'Logout successful' });
     } catch (error) {
       return res.status(500).json({ message: 'Server error', error });
+    }
+  }
+
+  async reserveSlot(req: CustomRequest, res: Response): Promise<Response> {
+    try {
+      const { doctorId, day, slotIndex } = req.body;
+      const patientId = req.user?.patientId; 
+      
+      if (!patientId) {
+        return res.status(401).json({ message: 'Authentication required' });
+      }
+      const reservedSlot = await patientRepository.reserveSlot(doctorId, day, slotIndex, patientId);
+
+      return res.status(200).json({ message: 'Slot reserved successfully', reservedSlot });
+    } catch (error: any) {
+      console.error('Error reserving slot:', error);
+      return res.status(500).json({ message: error.message || 'Server error' });
+    }
+  }
+    async createPaymentSession(req: Request, res: Response) {
+    const { doctorId, amount } = req.body;
+  
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          { 
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'Doctor Appointment Booking',
+              },
+              unit_amount: amount, // Amount in cents
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${process.env.FRONTEND_URL}`,
+        cancel_url: `${process.env.FRONTEND_URL}`,
+      });
+  
+      res.json({ sessionId: session.id });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Could not create payment session' });
     }
   }
 

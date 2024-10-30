@@ -27,5 +27,10 @@ router.post('/profile', authMiddleware, upload.single('profilePhoto'), patientCo
 // GET /api/patient/nearby-doctors - Get nearby doctors
 router.get('/nearby-doctors', authMiddleware, patientController.getDoctorsNearby.bind(patientController));
 
+router.post('/book-slot', authMiddleware, patientController.reserveSlot.bind(patientController))
+
+
+router.post('/payment/create-session' ,authMiddleware, patientController.createPaymentSession.bind(patientController))
+
 export default router;
  

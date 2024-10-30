@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+import { DefaultTokenModel } from '../models/defaultTokenModel';
 import { Doctor } from '../models/doctorModel';
 import { Patient } from '../models/patientModel';
 
@@ -84,7 +86,28 @@ class PatientRepository {
       .exec(); // Execute the query  
     return {doctors, totalCount};
   }
+  
+  async reserveSlot(doctorId: mongoose.Schema.Types.ObjectId, day: string, slotIndex: number, patientId: mongoose.Schema.Types.ObjectId) {
+    // Find the document for the specified doctor and day
+    const defaultToken = await DefaultTokenModel.findOne({ doctorId, day });
 
+    if (!defaultToken) {
+      throw new Error("Doctor or day not found.");
+    }
+
+    // Check if the slot index is valid
+    if (slotIndex < 0 || slotIndex >= defaultToken.slots.length) {
+      throw new Error("Invalid slot index.");
+    }
+
+    // Update the slot status and assign the patientId
+    defaultToken.slots[slotIndex].status = 'reserved';
+    defaultToken.slots[slotIndex].patientId = patientId;
+
+    // Save the updated document
+    await defaultToken.save();
+    return defaultToken.slots[slotIndex];
+  }
 
 }
 

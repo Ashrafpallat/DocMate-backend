@@ -75,6 +75,7 @@ class DoctorRepository {
       throw error;
     }
   }
+  
 
 }
 
