@@ -22,7 +22,7 @@ const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunct
             const decodedRefreshToken = verifyToken(refreshToken, true); // true indicates it's a refresh token
             // Generate a new access token
             token = generateAccessToken({
-                doctorId: decodedRefreshToken.doctorId, // You might have different payload data
+                userId: decodedRefreshToken.userId, 
                 email: decodedRefreshToken.email,
                 name: decodedRefreshToken.name,
             },res);

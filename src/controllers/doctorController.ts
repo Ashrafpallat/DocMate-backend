@@ -18,8 +18,8 @@ class DoctorController {
       // Use the repository method to find or create the doctor
 
       const doctor = await doctorRepository.googleAuth(name, email);
-      const accessToken = generateAccessToken({ doctorId: doctor._id, email: doctor.email, name: doctor.name }, res);
-      const refreshToken = generateRefreshToken({ doctorId: doctor._id, email: doctor.email, name: doctor.name }, res);
+      const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
+      const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
       console.log('tokens created', accessToken, refreshToken);
 
       return res.status(200).json({ message: 'User authenticated', doctor });
@@ -77,8 +77,8 @@ class DoctorController {
       const { doctor } = await doctorService.loginDoctor(email, password);
 
       // Generate and set access and refresh tokens
-      const accessToken = generateAccessToken({ doctorId: doctor._id, email: doctor.email, name: doctor.name }, res);
-      const refreshToken = generateRefreshToken({ doctorId: doctor._id, email: doctor.email, name: doctor.name }, res);
+      const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
+      const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
 
       // Return success response with the doctor and token
       return res.status(200).json({ message: 'Login successful', doctor });
@@ -121,7 +121,8 @@ class DoctorController {
     try {
       // Upload the proof file to Cloudinary (or your chosen service)
       const uploadResult = await cloudinary.v2.uploader.upload(proofFile.path);
-      const doctorId = req.user.doctorId;
+      const doctorId = req.user.userId
+      ;
 
       // Create the verification data object
       const verificationData = {
@@ -154,7 +155,7 @@ class DoctorController {
   }
   async getProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
-      const doctorId = req.user?.doctorId;
+      const doctorId = req.user?.userId;
       const doctor = await doctorRepository.findDoctorbyId(doctorId)
       if (!doctor) {
         return res.status(404).json({ message: 'Doctor not found' });
@@ -171,7 +172,7 @@ class DoctorController {
     try {
       console.log('update profile', req.file);
 
-      const doctorId = req.user?.doctorId; // Assuming req.user has the authenticated doctorI      
+      const doctorId = req.user?.userId; // Assuming req.user has the authenticated doctorI      
       const doctor = await doctorRepository.findDoctorbyId(doctorId);
       if (!doctor) {
         return res.status(404).json({ message: 'Doctor not found' });
@@ -211,7 +212,7 @@ class DoctorController {
   async saveDefaultTokens(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const { selectedDay, slots } = req.body;
-      const doctorId = req.user?.doctorId; // Assuming req.user has the authenticated doctorI      
+      const doctorId = req.user?.userId; // Assuming req.user has the authenticated doctorI      
 
       const defaultTokens = await doctorService.saveDefaultTokens(selectedDay, slots, doctorId);
 

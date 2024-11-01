@@ -26,9 +26,7 @@ class PatientController {
         return res.status(401).json({ message: 'No refresh token provided' });
       }
       const decoded = verifyToken(refreshToken, true); // Verify the refresh token
-      // Generate and set the new access token using the utility function
-      const accessToken = generateAccessToken({ patientId: decoded.patientId, email: decoded.email, name: decoded.name }, res);
-      // No need to manually set the cookie here, as it's done in the `generateAccessToken` function
+      const accessToken = generateAccessToken({ userId: decoded.userId, email: decoded.email, name: decoded.name }, res);
       return res.status(200).json({ message: 'New access token issued' });
     } catch (error: any) {
       return res.status(401).json({ message: 'Invalid or expired refresh token' });
@@ -38,11 +36,9 @@ class PatientController {
   async googleAuth(req: Request, res: Response): Promise<Response> {
     const { name, email } = req.body;
     try {
-      // Authenticate or register the user using Google credentials
       const patient = await patientRepository.googleAuth(name, email);
-      // Generate and set tokens (access and refresh tokens)
-      generateAccessToken({ patientId: patient._id, email: patient.email, name: patient.name }, res);
-      generateRefreshToken({ patientId: patient._id, email: patient.email, name: patient.name }, res);
+      generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
+      generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
       return res.status(200).json({ message: 'User authenticated', patient });
     } catch (error) {
       console.error('Error processing Google authentication:', error);
@@ -75,9 +71,8 @@ class PatientController {
       const { email, password } = req.body;
       const { patient } = await patientService.loginPatient(email, password);
 
-      // Generate and set access and refresh tokens
-      const accessToken = generateAccessToken({ patientId: patient._id, email: patient.email, name: patient.name }, res);
-      const refreshToken = generateRefreshToken({ patientId: patient._id, email: patient.email, name: patient.name }, res);
+      const accessToken = generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
+      const refreshToken = generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
 
       return res.status(200).json({ message: 'Login successful', patient });
     } catch (error: any) {
@@ -87,8 +82,8 @@ class PatientController {
 
   async getProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
-      const patientId = req.user?.patientId;
-      console.log(patientId);
+      const patientId = req.user?.userId;
+      console.log(req.user);
       
 
       const patient = await patientRepository.findPatientById(patientId)
@@ -100,7 +95,6 @@ class PatientController {
       return res.status(200).json(patient);
     } catch (error) {
       console.error('Error fetching patient profile:', error);
-      // Return 500 if there is a server error
       return res.status(500).json({ message: 'Server error' });
     }
   }
@@ -108,7 +102,7 @@ class PatientController {
     try {
       console.log('update profile',req.file);
       
-      const patientId = req.user?.patientId; // Assuming req.user has the authenticated doctorI      
+      const patientId = req.user?.userId; // Assuming req.user has the authenticated doctorI      
       const patient = await patientRepository.findPatientById(patientId);      
       if (!patient) {
         return res.status(404).json({ message: 'patient not found' });
@@ -126,7 +120,6 @@ class PatientController {
         profilePhoto: uploadResult.secure_url || patient.profilePhoto || ''
       };
 
-      // Update doctor details in the repository
       const updatedDoctor = await patientRepository.updatePatientProfile(patientId, updatedData);
 
       return res.status(200).json(updatedDoctor);
@@ -194,7 +187,7 @@ class PatientController {
   async reserveSlot(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const { doctorId, day, slotIndex } = req.body;
-      const patientId = req.user?.patientId; 
+      const patientId = req.user?.userId; 
       
       if (!patientId) {
         return res.status(401).json({ message: 'Authentication required' });
