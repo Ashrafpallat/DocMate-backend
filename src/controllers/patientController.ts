@@ -82,10 +82,7 @@ class PatientController {
 
   async getProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
-      const patientId = req.user?.userId;
-      console.log(req.user);
-      
-
+      const patientId = req.user?.userId;      
       const patient = await patientRepository.findPatientById(patientId)
       if (!patient) {
         console.log('patient not found');
@@ -99,9 +96,7 @@ class PatientController {
     }
   }
   async updateProfile(req: CustomRequest, res: Response): Promise<Response> {
-    try {
-      console.log('update profile',req.file);
-      
+    try {      
       const patientId = req.user?.userId; // Assuming req.user has the authenticated doctorI      
       const patient = await patientRepository.findPatientById(patientId);      
       if (!patient) {
@@ -201,7 +196,7 @@ class PatientController {
     }
   }
     async createPaymentSession(req: Request, res: Response) {
-    const { doctorId, amount } = req.body;
+    const { doctorId, amount, day, slotIndex } = req.body;
   
     try {
       const session = await stripe.checkout.sessions.create({
@@ -209,18 +204,18 @@ class PatientController {
         line_items: [
           { 
             price_data: {
-              currency: 'usd',
+              currency: 'inr',
               product_data: {
                 name: 'Doctor Appointment Booking',
               },
-              unit_amount: amount, // Amount in cents
+              unit_amount: amount, // Amount in paise (1 INR = 100 paise)
             },
             quantity: 1,
           },
         ],
         mode: 'payment',
-        success_url: `${process.env.FRONTEND_URL}`,
-        cancel_url: `${process.env.FRONTEND_URL}`,
+        success_url: `${process.env.FRONTEND_URL}/payment-success?doctorId=${doctorId}&day=${day}&slotIndex=${slotIndex}`,
+        cancel_url: `${process.env.FRONTEND_URL}/payment-failed`,
       });
   
       res.json({ sessionId: session.id });
