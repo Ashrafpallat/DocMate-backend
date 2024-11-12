@@ -124,9 +124,7 @@ class PatientController {
     }
   }
   async getDoctorsNearby(req: Request, res: Response): Promise<Response> {
-    try {
-      console.log(req.query);
-      
+    try {      
       const { lat, lng, page = 1, limit = 3 } = req.query; // Default to page 1 and limit 3
       if (!lat || !lng) {
         return res.status(400).json({ message: 'Latitude and longitude are required' });

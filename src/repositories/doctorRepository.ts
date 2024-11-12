@@ -57,10 +57,8 @@ class DoctorRepository {
     let defaultTokens = await DefaultTokenModel.findOne({ day, doctorId }).exec();
 
     if (defaultTokens) {
-      // Update existing tokens for the doctor on that day
       defaultTokens.slots = tokens;
     } else {
-      // Create a new entry if no tokens exist for that day and doctor
       defaultTokens = new DefaultTokenModel({ day, slots: tokens, doctorId });
     }
     return await defaultTokens.save();

@@ -49,7 +49,6 @@ export const doctorService = {
   async getDoctorSlots(doctorId: string): Promise<DefaultToken[]> {
     try {
       return await doctorRepository.findSlotsByDoctorId(doctorId);
-      // return slots.length > 0 ? slots : [];
     } catch (error) {
       console.error('Error in doctor service:', error);
       throw error;
