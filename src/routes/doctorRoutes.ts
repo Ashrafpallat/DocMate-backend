@@ -20,6 +20,7 @@ router.get('/profile',authMiddleware, doctorController.getProfile.bind(doctorCon
 router.post('/profile',authMiddleware,upload.single('profilePhoto'), doctorController.updateProfile.bind(doctorController))
 router.post('/save-slots', authMiddleware, doctorController.saveDefaultTokens.bind(doctorController))
 router.get('/:doctorId/slots', authMiddleware, doctorController.getDoctorSlots.bind(doctorController))
+router.get('/doctor/slotes', authMiddleware, doctorController.getDoctorSlots.bind(doctorController))
 
   
 export default router;

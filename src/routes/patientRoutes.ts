@@ -31,6 +31,6 @@ router.post('/book-slot', authMiddleware, patientController.reserveSlot.bind(pat
 
 
 router.post('/payment/create-session' ,authMiddleware, patientController.createPaymentSession.bind(patientController))
-
+ 
 export default router;
  

@@ -66,8 +66,12 @@ class DoctorRepository {
 
   async findSlotsByDoctorId(doctorId: string): Promise<DefaultToken[]> {
     try {      
-      const today = moment().format('dddd'); // Get current day (e.g., 'Monday')
-      return await DefaultTokenModel.find({ doctorId, day: today });
+      const today = moment().format('dddd');
+      return await DefaultTokenModel.find({ doctorId, day: today })
+        .populate({
+          path: 'slots.patientId', // Populate the patientId field inside the slots
+          select: 'name age email gender location' // Specify which patient details to retrieve
+        });
     } catch (error) {
       console.error('Error finding slots by doctorId:', error);
       throw error;

@@ -225,10 +225,13 @@ class DoctorController {
       return res.status(500).json({ message: 'Internal server error' });
     }
   }
-  async getDoctorSlots(req: Request, res: Response): Promise<void> {
-    try {
-      const { doctorId } = req.params;
-      const slots = await doctorService.getDoctorSlots(doctorId);
+  async getDoctorSlots(req: CustomRequest, res: Response): Promise<void> {
+    try {      
+      let { doctorId } = req.params
+      if(!doctorId){
+        doctorId = req.user?.userId;
+      }      
+      const slots = await doctorService.getDoctorSlots(doctorId);      
       res.status(200).json(slots);
     } catch (error) {
       console.error('Error fetching slots:', error);
