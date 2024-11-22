@@ -1,5 +1,7 @@
+import mongoose from 'mongoose';
 import { DefaultToken, DefaultTokenModel } from '../models/defaultTokenModel';
 import { Doctor } from '../models/doctorModel';
+import prescriptionModel, { IPrescription } from '../models/prescriptionModel';
 import VerificationRequest from '../models/verificationModel';
 import moment from 'moment';
 
@@ -65,7 +67,7 @@ class DoctorRepository {
   }
 
   async findSlotsByDoctorId(doctorId: string): Promise<DefaultToken[]> {
-    try {      
+    try {
       const today = moment().format('dddd');
       return await DefaultTokenModel.find({ doctorId, day: today })
         .populate({
@@ -77,7 +79,39 @@ class DoctorRepository {
       throw error;
     }
   }
-  
+  async savePrescription(symptoms: string, diagnosis: string, medications: string, doctorId: string, patientId: string): Promise<IPrescription> {
+    try {      
+      const newPrescription = new prescriptionModel({
+        symptoms,
+        diagnosis,
+        medications,
+        doctorId: new mongoose.Types.ObjectId(doctorId),
+        patientId: new mongoose.Types.ObjectId(patientId),
+      });
+
+      const savedPrescription = await newPrescription.save();
+      console.log('Prescription saved successfully:');
+      const today = moment().format('dddd');
+      const updateStatus = await DefaultTokenModel.updateMany(
+        {
+          doctorId: doctorId,
+          day: today,
+          "slots.patientId": patientId, // Match the specific slot by patientId
+        },
+        {
+          $set: { "slots.$.status": "consulted" }, // Update the status of the matched slot
+        }
+      );
+      // console.log(updateStatus);
+
+      return savedPrescription;
+    } catch (error) {
+      console.error('Error saving prescription:', error);
+      throw error;
+    }
+  }
+
+
 
 }
 

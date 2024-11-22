@@ -51,7 +51,7 @@ export const doctorService = {
       return await doctorRepository.findSlotsByDoctorId(doctorId);
     } catch (error) {
       console.error('Error in doctor service:', error);
-      throw error;
+      throw error;  
     }
   }
 };

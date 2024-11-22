@@ -15,8 +15,6 @@ class DoctorController {
     const { name, email } = req.body;
 
     try {
-      // Use the repository method to find or create the doctor
-
       const doctor = await doctorRepository.googleAuth(name, email);
       const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
       const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
@@ -122,7 +120,7 @@ class DoctorController {
       // Upload the proof file to Cloudinary (or your chosen service)
       const uploadResult = await cloudinary.v2.uploader.upload(proofFile.path);
       const doctorId = req.user.userId
-      ;
+        ;
 
       // Create the verification data object
       const verificationData = {
@@ -226,18 +224,38 @@ class DoctorController {
     }
   }
   async getDoctorSlots(req: CustomRequest, res: Response): Promise<void> {
-    try {      
+    try {
       let { doctorId } = req.params
-      if(!doctorId){
+      if (!doctorId) {
         doctorId = req.user?.userId;
-      }      
-      const slots = await doctorService.getDoctorSlots(doctorId);      
+      }
+      const slots = await doctorService.getDoctorSlots(doctorId);
       res.status(200).json(slots);
     } catch (error) {
       console.error('Error fetching slots:', error);
       res.status(500).json({ message: error || 'Server error. Could not fetch slots.' });
     }
   };
+
+  async savePrescription(req: CustomRequest, res: Response): Promise<Response> {
+    try {
+      const { symptoms, diagnosis, medications, patientId } = req.body;
+      const doctorId = req.user?.userId;       
+
+      if (!doctorId) {
+        return res.status(400).json({ message: 'Doctor ID is missing.' });
+      }
+
+      const prescription = await doctorRepository.savePrescription(symptoms, diagnosis, medications, doctorId, patientId);
+      return res.status(201).json({
+        message: 'Prescription saved successfully',
+        prescription,
+      });
+    } catch (error) {
+      console.error('Error saving prescription:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
 
 }
 

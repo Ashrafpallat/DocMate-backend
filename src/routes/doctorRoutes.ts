@@ -22,5 +22,7 @@ router.post('/save-slots', authMiddleware, doctorController.saveDefaultTokens.bi
 router.get('/:doctorId/slots', authMiddleware, doctorController.getDoctorSlots.bind(doctorController))
 router.get('/doctor/slotes', authMiddleware, doctorController.getDoctorSlots.bind(doctorController))
 
+router.post('/prescription', authMiddleware, doctorController.savePrescription.bind(doctorController))
+
   
 export default router;
