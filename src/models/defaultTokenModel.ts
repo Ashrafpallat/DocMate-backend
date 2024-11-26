@@ -6,6 +6,7 @@ interface Slot {
   start: string;
   end: string;
   status: SlotStatus;  
+  statusUpdatedAt: Date;
   patientId?: mongoose.Schema.Types.ObjectId;  
 }
 
@@ -13,6 +14,7 @@ const SlotSchema: Schema = new Schema({
   start: { type: String, required: true },
   end: { type: String, required: true },
   status: { type: String, enum: [ 'issued', 'reserved', 'consulted', 'cancelled'], default: 'issued' },  
+  statusUpdatedAt: { type: Date, default: Date.now },
   patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient', default: null }, 
 });
 

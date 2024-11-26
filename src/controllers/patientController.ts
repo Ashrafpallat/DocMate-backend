@@ -44,7 +44,7 @@ class PatientController {
       console.error('Error processing Google authentication:', error);
       return res.status(500).json({ message: 'Internal server error' });
     }
-  } 
+  }
 
   async signup(req: Request, res: Response): Promise<Response> {
     try {
@@ -82,7 +82,9 @@ class PatientController {
 
   async getProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
-      const patientId = req.user?.userId;      
+      const patientId = req.user?.userId;
+      console.log(patientId);
+      
       const patient = await patientRepository.findPatientById(patientId)
       if (!patient) {
         console.log('patient not found');
@@ -96,15 +98,15 @@ class PatientController {
     }
   }
   async updateProfile(req: CustomRequest, res: Response): Promise<Response> {
-    try {      
+    try {
       const patientId = req.user?.userId; // Assuming req.user has the authenticated doctorI      
-      const patient = await patientRepository.findPatientById(patientId);      
+      const patient = await patientRepository.findPatientById(patientId);
       if (!patient) {
         return res.status(404).json({ message: 'patient not found' });
-      }      
+      }
       let profilePhoto = req.file ? req.file.path : patient.profilePhoto
-      console.log('profilephoto',profilePhoto);
-      
+      console.log('profilephoto', profilePhoto);
+
       const uploadResult = await cloudinary.v2.uploader.upload(profilePhoto);
 
       const updatedData = {
@@ -124,7 +126,7 @@ class PatientController {
     }
   }
   async getDoctorsNearby(req: Request, res: Response): Promise<Response> {
-    try {      
+    try {
       const { lat, lng, page = 1, limit = 3 } = req.query; // Default to page 1 and limit 3
       if (!lat || !lng) {
         return res.status(400).json({ message: 'Latitude and longitude are required' });
@@ -134,19 +136,19 @@ class PatientController {
       if (isNaN(latitude) || isNaN(longitude)) {
         return res.status(400).json({ message: 'Invalid latitude or longitude' });
       }
-  
+
       // Convert page and limit to numbers
       const pageNum = parseInt(page as string, 10);
       const limitNum = parseInt(limit as string, 10);
-      
-      const {doctors,totalCount} = await patientRepository.findDoctorsNearby(latitude, longitude, pageNum, limitNum);      
-      return res.status(200).json({doctors,totalCount});
+
+      const { doctors, totalCount } = await patientRepository.findDoctorsNearby(latitude, longitude, pageNum, limitNum);
+      return res.status(200).json({ doctors, totalCount });
     } catch (error) {
       console.error('Error fetching nearby doctors:', error);
       return res.status(500).json({ message: 'Server error' });
     }
   }
-  
+
 
 
 
@@ -180,8 +182,8 @@ class PatientController {
   async reserveSlot(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const { doctorId, day, slotIndex } = req.body;
-      const patientId = req.user?.userId; 
-      
+      const patientId = req.user?.userId;
+
       if (!patientId) {
         return res.status(401).json({ message: 'Authentication required' });
       }
@@ -193,14 +195,14 @@ class PatientController {
       return res.status(500).json({ message: error.message || 'Server error' });
     }
   }
-    async createPaymentSession(req: Request, res: Response) {
+  async createPaymentSession(req: Request, res: Response) {
     const { doctorId, amount, day, slotIndex } = req.body;
-  
+
     try {
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
-          { 
+          {
             price_data: {
               currency: 'inr',
               product_data: {
@@ -215,13 +217,37 @@ class PatientController {
         success_url: `${process.env.FRONTEND_URL}/payment-success?doctorId=${doctorId}&day=${day}&slotIndex=${slotIndex}`,
         cancel_url: `${process.env.FRONTEND_URL}/payment-failed`,
       });
-  
+
       res.json({ sessionId: session.id });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Could not create payment session' });
     }
   }
+
+  async pendingAppointments(req: CustomRequest, res: Response): Promise<Response> {
+    try {      
+      const patientId = req.user?.userId;
+  
+      if (!patientId) {
+        return res.status(401).json({ message: 'Authentication required' });
+      }
+  
+      // Fetch the patient's pending appointments from the service
+      const appointments = await patientService.findPendingAppointments(patientId);
+  
+      if (!appointments || appointments.length === 0) {
+        return res.status(404).json({ message: 'No appointments found' });
+      }
+  
+      return res.status(200).json({ message: 'Appointments fetched successfully', appointments });
+    } catch (error: any) {
+      console.error('Error fetching appointments:', error.message);
+      return res.status(500).json({ message: error.message || 'Server error' });
+    }
+  }
+  
+
 
 }
 

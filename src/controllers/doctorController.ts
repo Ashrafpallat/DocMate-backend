@@ -162,7 +162,6 @@ class DoctorController {
       return res.status(200).json(doctor);
     } catch (error) {
       console.error('Error fetching doctor profile:', error);
-      // Return 500 if there is a server error
       return res.status(500).json({ message: 'Server error' });
     }
   }

@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
-import { DefaultTokenModel } from '../models/defaultTokenModel';
+import { DefaultToken, DefaultTokenModel } from '../models/defaultTokenModel';
 import { Doctor } from '../models/doctorModel';
 import { Patient } from '../models/patientModel';
+import moment from 'moment';
 
 class PatientRepository {
   async findPatientByEmail(email: string) {
@@ -94,6 +95,24 @@ class PatientRepository {
 
     await defaultToken.save();
     return defaultToken.slots[slotIndex];
+  }
+
+  async findPendingAppointments(patientId: string): Promise<DefaultToken[]> {
+    try {      
+      const today = moment().format('dddd');
+      return await DefaultTokenModel.find({
+        "slots.patientId": patientId, // Match slots with the given patientId
+        "slots.status": { $ne: "consulted" }, // Status is not 'consulted'
+        day: today, // Match today's day
+      })
+        .populate({
+          path: "doctorId", // Populate doctor details
+          select: "profilePhoto name specialization email contactNumber", // Select desired fields
+        });
+    } catch (error) {
+      console.error("Error finding pending appointments for patient:", error);
+      throw error;
+    }
   }
 
 }

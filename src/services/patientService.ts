@@ -34,7 +34,16 @@ export const patientService = {
       process.env.JWT_SECRET || 'fallback-secret',
       { expiresIn: '30d' }
     );
-
     return { patient, token };
+  },
+
+  async findPendingAppointments(patientId: string) {
+    try {
+      const pendingAppointments = await patientRepository.findPendingAppointments(patientId);
+      return pendingAppointments;
+    } catch (error) {
+      console.error('Error fetching pending appointments:', error);
+      throw new Error('Could not fetch pending appointments');
+    }
   },
 };
