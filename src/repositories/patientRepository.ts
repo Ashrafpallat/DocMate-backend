@@ -3,6 +3,7 @@ import { DefaultToken, DefaultTokenModel } from '../models/defaultTokenModel';
 import { Doctor } from '../models/doctorModel';
 import { Patient } from '../models/patientModel';
 import moment from 'moment';
+import prescriptionModel from '../models/prescriptionModel';
 
 class PatientRepository {
   async findPatientByEmail(email: string) {
@@ -113,6 +114,11 @@ class PatientRepository {
       console.error("Error finding pending appointments for patient:", error);
       throw error;
     }
+  }
+  async getPrescriptionsByPatientId(patientId: string){
+    return await prescriptionModel.find({ patientId })
+    .populate('doctorId', 'name email specialization profilePhoto')
+    .sort({ date: -1 }); // Sort by date in descending order
   }
 
 }

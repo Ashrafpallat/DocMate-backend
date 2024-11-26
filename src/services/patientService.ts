@@ -46,4 +46,15 @@ export const patientService = {
       throw new Error('Could not fetch pending appointments');
     }
   },
+  async getPrescriptionsByPatientId(patientId: string){
+    if (!patientId) {
+      throw new Error('Patient ID is required');
+    }
+    const prescriptions = await patientRepository.getPrescriptionsByPatientId(patientId)
+    if (!prescriptions || prescriptions.length === 0) {
+      throw new Error('No prescriptions found for this patient');
+    }
+    return prescriptions;
+  }
+  
 };

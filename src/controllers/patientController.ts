@@ -84,7 +84,7 @@ class PatientController {
     try {
       const patientId = req.user?.userId;
       console.log(patientId);
-      
+
       const patient = await patientRepository.findPatientById(patientId)
       if (!patient) {
         console.log('patient not found');
@@ -226,27 +226,39 @@ class PatientController {
   }
 
   async pendingAppointments(req: CustomRequest, res: Response): Promise<Response> {
-    try {      
+    try {
       const patientId = req.user?.userId;
-  
+
       if (!patientId) {
         return res.status(401).json({ message: 'Authentication required' });
       }
-  
+
       // Fetch the patient's pending appointments from the service
       const appointments = await patientService.findPendingAppointments(patientId);
-  
+
       if (!appointments || appointments.length === 0) {
         return res.status(404).json({ message: 'No appointments found' });
       }
-  
+
       return res.status(200).json({ message: 'Appointments fetched successfully', appointments });
     } catch (error: any) {
       console.error('Error fetching appointments:', error.message);
       return res.status(500).json({ message: error.message || 'Server error' });
     }
   }
-  
+  async getPrescriptionsByPatientId(req: CustomRequest, res: Response) {
+    try {
+      const patientId = req.user?.userId;
+      const prescriptions = await patientService.getPrescriptionsByPatientId(patientId);
+
+      res.status(200).json( prescriptions );
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
 
 
 }
