@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { patientController } from '../controllers/patientController';
 import authMiddleware from '../middleware/jwtAuth';
 import { upload } from '../middleware/upload';
+import { checkUserStatus } from '../middleware/userStatus';
 
 const router = Router();
 
@@ -19,7 +20,7 @@ router.post('/logout', patientController.logout.bind(patientController));
 router.post('/google-auth', patientController.googleAuth.bind(patientController));
 
 // GET /api/patient/profile - Get patient profile
-router.get('/profile', authMiddleware, patientController.getProfile.bind(patientController));
+router.get('/profile', authMiddleware,checkUserStatus, patientController.getProfile.bind(patientController));
 
 // POST /api/patient/profile - Update patient profile
 router.post('/profile', authMiddleware, upload.single('profilePhoto'), patientController.updateProfile.bind(patientController));

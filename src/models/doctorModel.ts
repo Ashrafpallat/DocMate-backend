@@ -24,7 +24,7 @@ const doctorSchema = new Schema<DoctorDocument>(
     age: { type: Number },
     fees: { type: Number },
     profilePhoto: { type: String },
-    status: { type: String, default: 'active' },
+    status: { type: String, default: 'Active' },
   },
   { timestamps: true }
 );

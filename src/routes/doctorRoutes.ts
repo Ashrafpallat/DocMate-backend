@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { doctorController } from '../controllers/doctorController';
 import { upload } from '../middleware/upload';
 import authMiddleware from '../middleware/jwtAuth'
+import { checkUserStatus } from '../middleware/userStatus';
 
 const router = Router();
 
@@ -16,7 +17,7 @@ router.post('/google-auth', doctorController.googleAuth.bind(doctorController));
 
 router.post('/verify',authMiddleware, upload.single('proofFile'), doctorController.verifyDoctor.bind(doctorController));
 
-router.get('/profile',authMiddleware, doctorController.getProfile.bind(doctorController))
+router.get('/profile',authMiddleware, checkUserStatus, doctorController.getProfile.bind(doctorController))
 router.post('/profile',authMiddleware,upload.single('profilePhoto'), doctorController.updateProfile.bind(doctorController))
 router.post('/save-slots', authMiddleware, doctorController.saveDefaultTokens.bind(doctorController))
 router.get('/:doctorId/slots', authMiddleware, doctorController.getDoctorSlots.bind(doctorController))

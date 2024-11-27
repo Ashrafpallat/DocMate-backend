@@ -85,6 +85,32 @@ class AdminController {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error', error });
     }
   }
+  async getAllDoctors(req: Request, res: Response) {
+    try {
+      const doctors = await adminService.fetchAllDoctors();
+      res.status(200).json(doctors);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch doctors', error });
+    }
+  }
+
+  // Block/Unblock a doctor
+  async updateDoctorStatus(req: Request, res: Response) {
+    try {      
+      const { doctorId } = req.params;
+      const { status } = req.body;
+
+      const updatedDoctor = await adminService.updateDoctorStatus(doctorId, status);
+
+      if (!updatedDoctor) {
+        return res.status(404).json({ message: 'Doctor not found' });
+      }
+
+      res.status(200).json({ message: `Doctor ${updatedDoctor.status === 'Active' ? 'unblocked' : 'Blocked'} successfully`, doctor: updatedDoctor });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to update doctor status', error });
+    }
+  }
 }
 
 export const adminController = new AdminController();

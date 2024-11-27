@@ -38,6 +38,9 @@ class PatientController {
     const { name, email } = req.body;
     try {
       const patient = await patientRepository.googleAuth(name, email);
+      if(patient.status === 'Blocked'){
+        return res.status(403).json({ message: 'Your account has been blocked.' });
+      }
       generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
       generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
       return res.status(HttpStatus.OK).json({ message: 'User authenticated', patient });
@@ -71,7 +74,9 @@ class PatientController {
     try {
       const { email, password } = req.body;
       const { patient } = await patientService.loginPatient(email, password);
-
+      if(patient.status === 'Blocked'){
+        return res.status(403).json({ message: 'Your account has been blocked.' });
+      }
       const accessToken = generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
       const refreshToken = generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
 

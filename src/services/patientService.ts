@@ -28,7 +28,6 @@ class PatientService {
     if (!isPasswordValid) {
       throw new Error('Invalid email or password');
     }
-
     return { patient };
   }
 

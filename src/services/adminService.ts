@@ -31,6 +31,15 @@ class AdminService {
   async updatePatientStatus(patientId: string, status: string) {
     return adminRepository.updatePatientStatus(patientId, status);
   }
+  async fetchAllDoctors() {
+    return adminRepository.getAllDoctors();
+  }
+
+  // Toggle the status of a doctor
+  async updateDoctorStatus(doctorId: string, status: string) {
+    // const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
+    return adminRepository.updateDoctorStatus(doctorId, status);
+  }
 }
 
 export const adminService = new AdminService();

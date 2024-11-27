@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { Patient } from '../models/patientModel';
+import { Doctor } from '../models/doctorModel';
 dotenv.config();
 
 class AdminRepository {
@@ -20,6 +21,18 @@ class AdminRepository {
 
   async updatePatientStatus(patientId: string, status: string) {
     return Patient.findByIdAndUpdate(patientId, { status }, { new: true }); // Update status (Active, Blocked)
+  }
+  async getAllDoctors() {
+    return Doctor.find();
+  }
+
+  // Update the status of a doctor
+  async updateDoctorStatus(doctorId: string, status: string) {
+    return Doctor.findByIdAndUpdate(
+      doctorId,
+      { status },
+      { new: true } // Return the updated document
+    );
   }
 }
 

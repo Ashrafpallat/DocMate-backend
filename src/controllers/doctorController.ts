@@ -16,7 +16,10 @@ class DoctorController {
     const { name, email } = req.body;
 
     try {
-      const doctor = await doctorRepository.googleAuth(name, email);      
+      const doctor = await doctorRepository.googleAuth(name, email); 
+      if(doctor.status === 'blocked'){
+        return res.status(403).json({ message: 'Your account has been blocked.' });
+      }     
       const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
       const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
       console.log('access token----', accessToken);
@@ -74,7 +77,9 @@ class DoctorController {
     try {
       const { email, password } = req.body;
       const { doctor } = await doctorService.loginDoctor(email, password);
-
+      if(doctor.status === 'blocked'){
+        return res.status(403).json({ message: 'Your account has been blocked.' });
+      }
       const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
       const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
 
