@@ -30,7 +30,7 @@ router.get('/nearby-doctors', authMiddleware, patientController.getDoctorsNearby
 router.post('/book-slot', authMiddleware, patientController.reserveSlot.bind(patientController))
 
 router.post('/payment/create-session' ,authMiddleware, patientController.createPaymentSession.bind(patientController))
-
+ 
 router.get('/pending-appointments', authMiddleware, patientController.pendingAppointments.bind(patientController))
 
 router.get('/history', authMiddleware, patientController.getPrescriptionsByPatientId.bind(patientController))

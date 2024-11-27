@@ -1,10 +1,12 @@
 import jwt from 'jsonwebtoken';
 
-export const adminService = {
+class AdminService {
+  // Admin login method
   async loginAdmin(email: string, password: string) {
     // Fetch the default admin credentials from .env
-    const adminEmail = process.env.ADMIN_EMAIL 
-    const adminPassword = process.env.ADMIN_PASSWORD 
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
     // Check if the provided email matches the .env admin email
     if (email !== adminEmail) {
       throw new Error('Invalid email or password');
@@ -31,4 +33,7 @@ export const adminService = {
       token
     };
   }
-};
+}
+
+// Export an instance of the AdminService class
+export const adminService = new AdminService();

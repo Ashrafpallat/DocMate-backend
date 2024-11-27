@@ -20,7 +20,7 @@ class DoctorRepository {
 
   // Google authentication: Find or create a patient
   async googleAuth(name: string, email: string) {
-    // Check if the patient already exists
+    // Check if the doctor already exists
     let doctor = await this.findDoctorByEmail(email);
 
     // If not, create a new doctor
@@ -34,11 +34,11 @@ class DoctorRepository {
         // Include any other default fields you want to set
       };
       doctor = await this.createDoctor(newDoctorData);
-      console.log('user created');
+      console.log('doctor created');
 
     }
 
-    console.log(' user exists');
+    console.log(' doctor exists');
     return doctor; // Return the patient (either found or newly created)
   }
 

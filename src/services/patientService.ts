@@ -1,22 +1,23 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { patientRepository } from '../repositories/patientRepository';
 
-export const patientService = {
+class PatientService {
+  // Register a new patient
   async registerPatient(patientData: any) {
     const existingPatient = await patientRepository.findPatientByEmail(patientData.email);
     if (existingPatient) {
       throw new Error('User already exists with this email');
     }
 
-    // Create new patient in the repository
+    // Create a new patient in the repository
     const newPatient = await patientRepository.createPatient({
       ...patientData,
     });
 
     return newPatient;
-  },
+  }
 
+  // Login a patient
   async loginPatient(email: string, password: string) {
     const patient = await patientRepository.findPatientByEmail(email);
     if (!patient) {
@@ -28,15 +29,10 @@ export const patientService = {
       throw new Error('Invalid email or password');
     }
 
-    // Generate JWT token with patient details
-    const token = jwt.sign(
-      { patientId: patient._id, email: patient.email, name: patient.name },
-      process.env.JWT_SECRET || 'fallback-secret',
-      { expiresIn: '30d' }
-    );
-    return { patient, token };
-  },
+    return { patient };
+  }
 
+  // Fetch pending appointments for a patient
   async findPendingAppointments(patientId: string) {
     try {
       const pendingAppointments = await patientRepository.findPendingAppointments(patientId);
@@ -45,16 +41,22 @@ export const patientService = {
       console.error('Error fetching pending appointments:', error);
       throw new Error('Could not fetch pending appointments');
     }
-  },
-  async getPrescriptionsByPatientId(patientId: string){
+  }
+
+  // Get prescriptions by patient ID
+  async getPrescriptionsByPatientId(patientId: string) {
     if (!patientId) {
       throw new Error('Patient ID is required');
     }
-    const prescriptions = await patientRepository.getPrescriptionsByPatientId(patientId)
+
+    const prescriptions = await patientRepository.getPrescriptionsByPatientId(patientId);
     if (!prescriptions || prescriptions.length === 0) {
       throw new Error('No prescriptions found for this patient');
     }
+
     return prescriptions;
   }
-  
-};
+}
+
+// Export an instance of the class
+export const patientService = new PatientService();

@@ -1,23 +1,24 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { doctorRepository } from '../repositories/doctorRepository';
 import { DefaultToken } from '../models/defaultTokenModel';
 
-export const doctorService = {
+class DoctorService {
+  // Register a new doctor
   async registerDoctor(doctorData: any) {
     const existingDoctor = await doctorRepository.findDoctorByEmail(doctorData.email);
     if (existingDoctor) {
       throw new Error('Doctor already exists with this email');
     }
 
-    // Create new doctor in the repository
+    // Create a new doctor in the repository
     const newDoctor = await doctorRepository.createDoctor({
       ...doctorData,
     });
 
     return newDoctor;
-  },
+  }
 
+  // Login a doctor
   async loginDoctor(email: string, password: string) {
     const doctor = await doctorRepository.findDoctorByEmail(email);
     if (!doctor) {
@@ -29,29 +30,26 @@ export const doctorService = {
       throw new Error('Invalid email or password');
     }
 
-    // Generate JWT token with doctor details
-    const token = jwt.sign(
-      { doctorId: doctor._id, email: doctor.email, name: doctor.name },
-      process.env.JWT_SECRET || 'fallback-secret',
-      { expiresIn: '30d' }
-    );
+    return { doctor };
+  }
 
-    return { doctor, token };
-  },
-
+  // Save or update default tokens for a specific day and doctor
   async saveDefaultTokens(day: string, tokens: any[], doctorId: string): Promise<any> {
-    // Any business logic can be added here (validation, etc.)
-
+    // Business logic for token validation can be added here
     const savedTokens = await doctorRepository.saveOrUpdateDefaultTokens(day, tokens, doctorId);
     return savedTokens;
-  },
+  }
 
+  // Get all slots for a specific doctor
   async getDoctorSlots(doctorId: string): Promise<DefaultToken[]> {
     try {
       return await doctorRepository.findSlotsByDoctorId(doctorId);
     } catch (error) {
       console.error('Error in doctor service:', error);
-      throw error;  
+      throw error;
     }
   }
-};
+}
+
+// Export an instance of the class
+export const doctorService = new DoctorService();

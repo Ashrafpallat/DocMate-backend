@@ -6,6 +6,7 @@ import { generateAccessToken, generateRefreshToken, verifyToken } from '../utils
 import cloudinary from '../config/cloudinery';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
+import { HttpStatus } from '../utils/HttpStatus'; // Import the HttpStatus enum
 
 dotenv.config();
 
@@ -23,13 +24,13 @@ class PatientController {
     try {
       const { refreshToken } = req.cookies;
       if (!refreshToken) {
-        return res.status(401).json({ message: 'No refresh token provided' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'No refresh token provided' });
       }
       const decoded = verifyToken(refreshToken, true); // Verify the refresh token
       const accessToken = generateAccessToken({ userId: decoded.userId, email: decoded.email, name: decoded.name }, res);
-      return res.status(200).json({ message: 'New access token issued' });
+      return res.status(HttpStatus.OK).json({ message: 'New access token issued' });
     } catch (error: any) {
-      return res.status(401).json({ message: 'Invalid or expired refresh token' });
+      return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Invalid or expired refresh token' });
     }
   }
 
@@ -39,10 +40,10 @@ class PatientController {
       const patient = await patientRepository.googleAuth(name, email);
       generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
       generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
-      return res.status(200).json({ message: 'User authenticated', patient });
+      return res.status(HttpStatus.OK).json({ message: 'User authenticated', patient });
     } catch (error) {
       console.error('Error processing Google authentication:', error);
-      return res.status(500).json({ message: 'Internal server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
     }
   }
 
@@ -59,9 +60,9 @@ class PatientController {
         location,
       });
 
-      return res.status(201).json({ message: 'User registered successfully', newPatient });
+      return res.status(HttpStatus.CREATED).json({ message: 'User registered successfully', newPatient });
     } catch (error: any) {
-      return res.status(400).json({ message: error.message });
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
     }
   }
 
@@ -74,35 +75,35 @@ class PatientController {
       const accessToken = generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
       const refreshToken = generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
 
-      return res.status(200).json({ message: 'Login successful', patient });
+      return res.status(HttpStatus.OK).json({ message: 'Login successful', patient });
     } catch (error: any) {
-      return res.status(400).json({ message: error.message });
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
     }
   }
 
   async getProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const patientId = req.user?.userId;
-      console.log(patientId);
+      console.log('patient id frm get profole ctrlr',patientId);
 
       const patient = await patientRepository.findPatientById(patientId)
       if (!patient) {
         console.log('patient not found');
-        return res.status(404).json({ message: 'patient not found' });
+        return res.status(HttpStatus.NOT_FOUND).json({ message: 'patient not found' });
       }
 
-      return res.status(200).json(patient);
+      return res.status(HttpStatus.OK).json(patient);
     } catch (error) {
       console.error('Error fetching patient profile:', error);
-      return res.status(500).json({ message: 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
     }
   }
   async updateProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
-      const patientId = req.user?.userId; // Assuming req.user has the authenticated doctorI      
+      const patientId = req.user?.userId;    
       const patient = await patientRepository.findPatientById(patientId);
       if (!patient) {
-        return res.status(404).json({ message: 'patient not found' });
+        return res.status(HttpStatus.NOT_FOUND).json({ message: 'patient not found' });
       }
       let profilePhoto = req.file ? req.file.path : patient.profilePhoto
       console.log('profilephoto', profilePhoto);
@@ -119,22 +120,22 @@ class PatientController {
 
       const updatedDoctor = await patientRepository.updatePatientProfile(patientId, updatedData);
 
-      return res.status(200).json(updatedDoctor);
+      return res.status(HttpStatus.OK).json(updatedDoctor);
     } catch (error) {
       console.error('Error updating doctor profile:', error);
-      return res.status(500).json({ message: 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
     }
   }
   async getDoctorsNearby(req: Request, res: Response): Promise<Response> {
     try {
       const { lat, lng, page = 1, limit = 3 } = req.query; // Default to page 1 and limit 3
       if (!lat || !lng) {
-        return res.status(400).json({ message: 'Latitude and longitude are required' });
+        return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Latitude and longitude are required' });
       }
       const latitude = parseFloat(lat as string);
       const longitude = parseFloat(lng as string);
       if (isNaN(latitude) || isNaN(longitude)) {
-        return res.status(400).json({ message: 'Invalid latitude or longitude' });
+        return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid latitude or longitude' });
       }
 
       // Convert page and limit to numbers
@@ -142,10 +143,10 @@ class PatientController {
       const limitNum = parseInt(limit as string, 10);
 
       const { doctors, totalCount } = await patientRepository.findDoctorsNearby(latitude, longitude, pageNum, limitNum);
-      return res.status(200).json({ doctors, totalCount });
+      return res.status(HttpStatus.OK).json({ doctors, totalCount });
     } catch (error) {
       console.error('Error fetching nearby doctors:', error);
-      return res.status(500).json({ message: 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
     }
   }
 
@@ -173,9 +174,9 @@ class PatientController {
       });
 
       console.log('Logout successful');
-      return res.status(200).json({ message: 'Logout successful' });
+      return res.status(HttpStatus.OK).json({ message: 'Logout successful' });
     } catch (error) {
-      return res.status(500).json({ message: 'Server error', error });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error', error });
     }
   }
 
@@ -185,14 +186,14 @@ class PatientController {
       const patientId = req.user?.userId;
 
       if (!patientId) {
-        return res.status(401).json({ message: 'Authentication required' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Authentication required' });
       }
       const reservedSlot = await patientRepository.reserveSlot(doctorId, day, slotIndex, patientId);
 
-      return res.status(200).json({ message: 'Slot reserved successfully', reservedSlot });
+      return res.status(HttpStatus.OK).json({ message: 'Slot reserved successfully', reservedSlot });
     } catch (error: any) {
       console.error('Error reserving slot:', error);
-      return res.status(500).json({ message: error.message || 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message || 'Server error' });
     }
   }
   async createPaymentSession(req: Request, res: Response) {
@@ -221,7 +222,7 @@ class PatientController {
       res.json({ sessionId: session.id });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Could not create payment session' });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Could not create payment session' });
     }
   }
 
@@ -230,20 +231,20 @@ class PatientController {
       const patientId = req.user?.userId;
 
       if (!patientId) {
-        return res.status(401).json({ message: 'Authentication required' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Authentication required' });
       }
 
       // Fetch the patient's pending appointments from the service
       const appointments = await patientService.findPendingAppointments(patientId);
 
       if (!appointments || appointments.length === 0) {
-        return res.status(404).json({ message: 'No appointments found' });
+        return res.status(HttpStatus.NOT_FOUND).json({ message: 'No appointments found' });
       }
 
-      return res.status(200).json({ message: 'Appointments fetched successfully', appointments });
+      return res.status(HttpStatus.OK).json({ message: 'Appointments fetched successfully', appointments });
     } catch (error: any) {
       console.error('Error fetching appointments:', error.message);
-      return res.status(500).json({ message: error.message || 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message || 'Server error' });
     }
   }
   async getPrescriptionsByPatientId(req: CustomRequest, res: Response) {
@@ -251,9 +252,9 @@ class PatientController {
       const patientId = req.user?.userId;
       const prescriptions = await patientService.getPrescriptionsByPatientId(patientId);
 
-      res.status(200).json( prescriptions );
+      res.status(HttpStatus.OK).json( prescriptions );
     } catch (error: any) {
-      res.status(400).json({
+      res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         message: error.message,
       });
