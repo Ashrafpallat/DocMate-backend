@@ -46,6 +46,31 @@ class AdminController {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
     }
   }
+  async getAllPatients(req: Request, res: Response): Promise<Response> {
+    try {
+      const patients = await adminService.getAllPatients();
+      return res.status(HttpStatus.OK).json(patients);
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+    }
+  }
+
+  async updatePatientStatus(req: Request, res: Response): Promise<Response> {
+    const { patientId } = req.params;
+    const { status } = req.body;
+
+    try {
+      const updatedPatient = await adminService.updatePatientStatus(patientId, status);
+      if (!updatedPatient) {
+        return res.status(HttpStatus.NOT_FOUND).json({ message: 'Patient not found' });
+      }
+      return res.status(HttpStatus.OK).json({ message: 'Patient status updated successfully', updatedPatient });
+    } catch (error) {
+      console.error('Error updating patient status:', error);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+    }
+  }
 
   async logout(req: Request, res: Response): Promise<Response> {
     try {

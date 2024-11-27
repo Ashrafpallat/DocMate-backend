@@ -7,7 +7,10 @@ const adminRouter = Router();
 adminRouter.post('/login', adminController.login);
 
 adminRouter.get('/pending-verifications', adminController.getPendingVerifications)
-adminRouter.post('/pending-verifications/:id', adminController.approveVerification); // For approving a verification
+adminRouter.post('/pending-verifications/:id', adminController.approveVerification); 
+
+adminRouter.get('/patients', adminController.getAllPatients)
+adminRouter.put('/patient/:patientId/status', adminController.updatePatientStatus); 
 
 
 // POST: http://localhost:5000/api/admin/logout

@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { Patient } from '../models/patientModel';
 dotenv.config();
 
 class AdminRepository {
@@ -12,6 +13,13 @@ class AdminRepository {
 
     // If no match found, return null
     return null;
+  }
+  async getAllPatients() {
+    return Patient.find(); // Fetch all patients
+  }
+
+  async updatePatientStatus(patientId: string, status: string) {
+    return Patient.findByIdAndUpdate(patientId, { status }, { new: true }); // Update status (Active, Blocked)
   }
 }
 
