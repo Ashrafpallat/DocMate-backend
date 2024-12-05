@@ -23,18 +23,18 @@ router.post('/google-auth', patientController.googleAuth.bind(patientController)
 router.get('/profile', authMiddleware,checkUserStatus, patientController.getProfile.bind(patientController));
 
 // POST /api/patient/profile - Update patient profile
-router.post('/profile', authMiddleware, upload.single('profilePhoto'), patientController.updateProfile.bind(patientController));
+router.post('/profile', authMiddleware, checkUserStatus, upload.single('profilePhoto'), patientController.updateProfile.bind(patientController));
 
 // GET /api/patient/nearby-doctors - Get nearby doctors
-router.get('/nearby-doctors', authMiddleware, patientController.getDoctorsNearby.bind(patientController));
+router.get('/nearby-doctors', authMiddleware, checkUserStatus, patientController.getDoctorsNearby.bind(patientController));
 
-router.post('/book-slot', authMiddleware, patientController.reserveSlot.bind(patientController))
+router.post('/book-slot', authMiddleware,checkUserStatus, patientController.reserveSlot.bind(patientController))
 
-router.post('/payment/create-session' ,authMiddleware, patientController.createPaymentSession.bind(patientController))
+router.post('/payment/create-session',authMiddleware,checkUserStatus, patientController.createPaymentSession.bind(patientController))
  
-router.get('/pending-appointments', authMiddleware, patientController.pendingAppointments.bind(patientController))
+router.get('/pending-appointments', authMiddleware,checkUserStatus, patientController.pendingAppointments.bind(patientController))
 
-router.get('/history', authMiddleware, patientController.getPrescriptionsByPatientId.bind(patientController))
+router.get('/history', authMiddleware,checkUserStatus, patientController.getPrescriptionsByPatientId.bind(patientController))
   
 export default router;
  

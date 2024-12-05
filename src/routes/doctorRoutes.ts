@@ -15,15 +15,15 @@ router.post('/logout', doctorController.logout.bind(doctorController));
 // POST /api/patient/google-auth - Google Authentication
 router.post('/google-auth', doctorController.googleAuth.bind(doctorController));
 
-router.post('/verify',authMiddleware, upload.single('proofFile'), doctorController.verifyDoctor.bind(doctorController));
+router.post('/verify',authMiddleware,checkUserStatus, upload.single('proofFile'), doctorController.verifyDoctor.bind(doctorController));
 
 router.get('/profile',authMiddleware, checkUserStatus, doctorController.getProfile.bind(doctorController))
-router.post('/profile',authMiddleware,upload.single('profilePhoto'), doctorController.updateProfile.bind(doctorController))
-router.post('/save-slots', authMiddleware, doctorController.saveDefaultTokens.bind(doctorController))
-router.get('/:doctorId/slots', authMiddleware, doctorController.getDoctorSlots.bind(doctorController))
-router.get('/doctor/slotes', authMiddleware, doctorController.getDoctorSlots.bind(doctorController))
+router.post('/profile',authMiddleware,checkUserStatus,upload.single('profilePhoto'), doctorController.updateProfile.bind(doctorController))
+router.post('/save-slots', authMiddleware,checkUserStatus, doctorController.saveDefaultTokens.bind(doctorController))
+router.get('/:doctorId/slots', authMiddleware,checkUserStatus, doctorController.getDoctorSlots.bind(doctorController))
+router.get('/doctor/slotes', authMiddleware,checkUserStatus, doctorController.getDoctorSlots.bind(doctorController))
 
-router.post('/prescription', authMiddleware, doctorController.savePrescription.bind(doctorController))
+router.post('/prescription', authMiddleware,checkUserStatus, doctorController.savePrescription.bind(doctorController))
 
 
 export default router;

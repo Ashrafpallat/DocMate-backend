@@ -81,6 +81,11 @@ class PatientRepository {
   }
   
   async reserveSlot(doctorId: mongoose.Schema.Types.ObjectId, day: string, slotIndex: number, patientId: mongoose.Schema.Types.ObjectId) {
+    const isBooked = await DefaultTokenModel.findById({ patientId: patientId})
+    if(isBooked){
+      console.log('');
+      
+    }
     const defaultToken = await DefaultTokenModel.findOne({ doctorId, day });
 
     if (!defaultToken) {
@@ -103,7 +108,7 @@ class PatientRepository {
       const today = moment().format('dddd');
       return await DefaultTokenModel.find({
         "slots.patientId": patientId, // Match slots with the given patientId
-        "slots.status": { $ne: "consulted" }, // Status is not 'consulted'
+        "slots.status": { $eq: "reserved" }, // Status is not 'consulted'
         day: today, // Match today's day
       })
         .populate({
