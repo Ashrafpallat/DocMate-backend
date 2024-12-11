@@ -163,7 +163,7 @@ class DoctorController {
       
       const doctor = await doctorRepository.findDoctorbyId(doctorId)
       if (!doctor) {
-        return res.status(HttpStatus.NOT_FOUND).json({ message: 'Doctor not found' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Doctor not found' });
       }
 
       return res.status(HttpStatus.OK).json(doctor);

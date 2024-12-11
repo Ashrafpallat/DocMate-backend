@@ -1,10 +1,8 @@
+import { CustomRequest } from '../interfaces/customRequest';
 import { verifyToken, generateAccessToken } from '../utils/generateToken'; // Assuming you have these utility functions
 import { Request, Response, NextFunction } from 'express';
 
 
-interface CustomRequest extends Request{
-    user?: String | any
-}
 
 const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunction) => {
     let token = req.cookies.accessToken;

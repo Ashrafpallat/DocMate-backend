@@ -3,6 +3,7 @@ import { doctorController } from '../controllers/doctorController';
 import { upload } from '../middleware/upload';
 import authMiddleware from '../middleware/jwtAuth'
 import { checkUserStatus } from '../middleware/userStatus';
+import resetOutdatedSlots from '../middleware/resetSlotStatus';
 
 const router = Router();
 
@@ -20,9 +21,9 @@ router.post('/verify',authMiddleware,checkUserStatus, upload.single('proofFile')
 router.get('/profile',authMiddleware, checkUserStatus, doctorController.getProfile.bind(doctorController))
 router.post('/profile',authMiddleware,checkUserStatus,upload.single('profilePhoto'), doctorController.updateProfile.bind(doctorController))
 router.post('/save-slots', authMiddleware,checkUserStatus, doctorController.saveDefaultTokens.bind(doctorController))
-router.get('/:doctorId/slots', authMiddleware,checkUserStatus, doctorController.getDoctorSlots.bind(doctorController))
-router.get('/doctor/slotes', authMiddleware,checkUserStatus, doctorController.getDoctorSlots.bind(doctorController))
-
+router.get('/:doctorId/slots', authMiddleware,checkUserStatus,resetOutdatedSlots, doctorController.getDoctorSlots.bind(doctorController))
+// router.get('/doctor/slotes', authMiddleware,checkUserStatus, doctorController.getDoctorSlots.bind(doctorController))
+ 
 router.post('/prescription', authMiddleware,checkUserStatus, doctorController.savePrescription.bind(doctorController))
 
 

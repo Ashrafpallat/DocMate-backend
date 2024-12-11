@@ -89,12 +89,12 @@ class PatientController {
   async getProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const patientId = req.user?.userId;
-      console.log('patient id frm get profole ctrlr',patientId);
+      console.log('patient id frm patient ctrlr, getProfile',patientId);
 
       const patient = await patientRepository.findPatientById(patientId)
       if (!patient) {
         console.log('patient not found');
-        return res.status(HttpStatus.NOT_FOUND).json({ message: 'patient not found' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'patient not found' });
       }
 
       return res.status(HttpStatus.OK).json(patient);
