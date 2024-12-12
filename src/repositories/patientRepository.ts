@@ -81,11 +81,6 @@ class PatientRepository {
   }
   
   async reserveSlot(doctorId: mongoose.Schema.Types.ObjectId, day: string, slotIndex: number, patientId: mongoose.Schema.Types.ObjectId) {
-    const isBooked = await DefaultTokenModel.findById({ patientId: patientId})
-    if(isBooked){
-      console.log('');
-      
-    }
     const defaultToken = await DefaultTokenModel.findOne({ doctorId, day });
 
     if (!defaultToken) {
@@ -95,7 +90,8 @@ class PatientRepository {
     if (slotIndex < 0 || slotIndex >= defaultToken.slots.length) {
       throw new Error("Invalid slot index.");
     }
-
+    console.log('patient id at patient repo resrveSlot', patientId);
+    
     defaultToken.slots[slotIndex].status = 'reserved';
     defaultToken.slots[slotIndex].patientId = patientId;
 

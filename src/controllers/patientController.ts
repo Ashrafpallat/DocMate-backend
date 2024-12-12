@@ -242,9 +242,9 @@ class PatientController {
       // Fetch the patient's pending appointments from the service
       const appointments = await patientService.findPendingAppointments(patientId);
 
-      if (!appointments || appointments.length === 0) {
-        return res.status(HttpStatus.NOT_FOUND).json({ message: 'No appointments found' });
-      }
+      // if (!appointments || appointments.length === 0) {
+      //   return res.status(HttpStatus.NOT_FOUND).json({ message: 'No appointments found' });
+      // }
 
       return res.status(HttpStatus.OK).json({ message: 'Appointments fetched successfully', appointments });
     } catch (error: any) {
