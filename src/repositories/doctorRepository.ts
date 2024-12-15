@@ -80,7 +80,7 @@ class DoctorRepository {
     }
   }
   async savePrescription(symptoms: string, diagnosis: string, medications: string, doctorId: string, patientId: string): Promise<IPrescription> {
-    try {      
+    try {
       const newPrescription = new prescriptionModel({
         symptoms,
         diagnosis,
@@ -110,7 +110,11 @@ class DoctorRepository {
       throw error;
     }
   }
-
+  async getPrescriptionsByDoctorId(doctorId: string) {
+    return await prescriptionModel.find({ doctorId })
+      .populate('patientId', 'name email age gender location')
+      .sort({ date: -1 }); // Sort by date in descending order
+  }
 
 
 }

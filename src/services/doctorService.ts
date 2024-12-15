@@ -49,6 +49,18 @@ class DoctorService {
       throw error;
     }
   }
+  async getPrescriptionsByDoctortId(doctorId: string) {
+      if (!doctorId) {
+        throw new Error('doctor ID is required');
+      }
+  
+      const prescriptions = await doctorRepository.getPrescriptionsByDoctorId(doctorId)
+      if (!prescriptions || prescriptions.length === 0) {
+        throw new Error('No prescriptions found for this doctor');
+      }
+  
+      return prescriptions;
+    }
 }
 
 // Export an instance of the class

@@ -263,6 +263,19 @@ class DoctorController {
     }
   }
 
+  async getPrescriptionsByDoctorId(req: CustomRequest, res: Response) {
+      try {
+        const doctorId = req.user?.userId;
+        const prescriptions = await doctorService.getPrescriptionsByDoctortId(doctorId)
+        res.status(HttpStatus.OK).json( prescriptions );
+      } catch (error: any) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          success: false,
+          message: error.message,
+        });
+      }
+    }
+
 }
 
 export const doctorController = new DoctorController();

@@ -33,7 +33,7 @@ mongoose
 
   // Create the index (this will create the index on the existing documents)
 Doctor.init().then(() => {
-  console.log('Geospatial index created!');
+  // console.log('Geospatial index created!');
 }).catch(err => {
   console.error('Error creating index:', err);
 });

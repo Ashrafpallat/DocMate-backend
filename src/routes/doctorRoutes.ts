@@ -22,9 +22,10 @@ router.get('/profile',authMiddleware, checkUserStatus, doctorController.getProfi
 router.post('/profile',authMiddleware,checkUserStatus,upload.single('profilePhoto'), doctorController.updateProfile.bind(doctorController))
 router.post('/save-slots', authMiddleware,checkUserStatus, doctorController.saveDefaultTokens.bind(doctorController))
 router.get('/:doctorId/slots', authMiddleware,checkUserStatus,resetOutdatedSlots, doctorController.getDoctorSlots.bind(doctorController))
-// router.get('/doctor/slotes', authMiddleware,checkUserStatus, doctorController.getDoctorSlots.bind(doctorController))
+router.get('/doctor/slotes', authMiddleware,checkUserStatus, doctorController.getDoctorSlots.bind(doctorController))
  
 router.post('/prescription', authMiddleware,checkUserStatus, doctorController.savePrescription.bind(doctorController))
 
+router.get('/history', authMiddleware,checkUserStatus, doctorController.getPrescriptionsByDoctorId.bind(doctorController))
 
 export default router;

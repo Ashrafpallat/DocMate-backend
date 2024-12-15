@@ -113,14 +113,21 @@ class PatientController {
       let profilePhoto = req.file ? req.file.path : patient.profilePhoto
       console.log('profilephoto', profilePhoto);
 
-      const uploadResult = await cloudinary.v2.uploader.upload(profilePhoto);
+      if (req.file) {
+        const uploadResult = await cloudinary.v2.uploader.upload(req.file.path);
+        profilePhoto = uploadResult.secure_url; // Update with the new uploaded photo URL
+      } else if (!patient.profilePhoto) {
+        profilePhoto = 'https://example.com/default-profile.png'; // Placeholder default image
+      }
+
+      // const uploadResult = await cloudinary.v2.uploader.upload(profilePhoto);
 
       const updatedData = {
         name: req.body.name || patient.name,
         email: req.body.email || patient.email,
         age: req.body.age || patient.age,
         location: req.body.location || patient.location,
-        profilePhoto: uploadResult.secure_url || patient.profilePhoto || ''
+        profilePhoto
       };
 
       const updatedDoctor = await patientRepository.updatePatientProfile(patientId, updatedData);
