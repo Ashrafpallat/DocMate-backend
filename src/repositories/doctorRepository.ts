@@ -119,7 +119,7 @@ class DoctorRepository {
   async getReviews(doctorId: string) {
     try {
       const reviews = await reviewModel.find({ doctorId })
-        .populate('patientId', 'name email age gender location') 
+        .populate('patientId', 'profilePhoto name email age gender location') 
         .sort({ createdAt: -1 }); 
   
       return reviews; 

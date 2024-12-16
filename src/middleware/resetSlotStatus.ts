@@ -18,15 +18,11 @@ async function resetOutdatedSlots(req: Request, res: Response, next: NextFunctio
             let isUpdated = false;
     
             
-            token.slots.forEach(slot => {
-                console.log('inside foreach', slot);
-                
+            token.slots.forEach(slot => {                
                 if (
                     slot.status !== 'issued' &&
                     new Date(new Date(slot.statusUpdatedAt).setHours(0, 0, 0, 0)) < new Date(currentDate)
-                ) {
-                    console.log('inside if');
-                    
+                ) {                    
                     slot.status = 'issued';
                     slot.statusUpdatedAt = new Date();
                     slot.patientId = undefined;

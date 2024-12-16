@@ -277,7 +277,9 @@ class DoctorController {
   }
   async getReviewsByDoctorId(req: CustomRequest, res: Response) {
     try {
-      const doctorId = req.user?.userId;
+      const doctorId = req.query.doctorId || req.user?.userId
+      console.log('doc id ',doctorId);
+      
       const reviews = await doctorService.getReviewsByDoctorId(doctorId);
       res.status(HttpStatus.OK).json(reviews);
     } catch (error: any) {
