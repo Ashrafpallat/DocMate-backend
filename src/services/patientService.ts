@@ -55,6 +55,15 @@ class PatientService {
 
     return prescriptions;
   }
+  async addReviewAndRating(patientId: string, doctorId: string, rating: number, review: string) {
+    try {
+       const result = patientRepository.addReviewAndRating(patientId,doctorId,rating,review)
+       return result
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
 }
 
 // Export an instance of the class

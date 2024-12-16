@@ -272,7 +272,13 @@ class PatientController {
       });
     }
   }
-
+  
+  async addReviewAndRating(req: CustomRequest, res: Response){
+    const patientId = req.user?.userId;
+    const {doctorId, rating, reviewText} = req.body    
+    await patientService.addReviewAndRating(patientId, doctorId, rating, reviewText)
+    return res.status(HttpStatus.OK).json({ message: 'review added successfully' });
+  }
 
 }
 

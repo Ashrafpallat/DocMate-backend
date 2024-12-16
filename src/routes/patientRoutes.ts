@@ -35,6 +35,7 @@ router.post('/payment/create-session',authMiddleware,checkUserStatus, patientCon
 router.get('/pending-appointments', authMiddleware,checkUserStatus, patientController.pendingAppointments.bind(patientController))
 
 router.get('/history', authMiddleware,checkUserStatus, patientController.getPrescriptionsByPatientId.bind(patientController))
-  
+
+router.post('/add-review', authMiddleware,checkUserStatus, patientController.addReviewAndRating.bind(patientController))
+
 export default router;
- 

@@ -4,6 +4,7 @@ import { Doctor } from '../models/doctorModel';
 import { Patient } from '../models/patientModel';
 import moment from 'moment';
 import prescriptionModel from '../models/prescriptionModel';
+import reviewModel from '../models/reviewModel';
 
 class PatientRepository {
   async findPatientByEmail(email: string) {
@@ -121,6 +122,44 @@ class PatientRepository {
     .populate('doctorId', 'name email specialization profilePhoto')
     .sort({ date: -1 }); // Sort by date in descending order
   }
+
+  async addReviewAndRating(patientId: string, doctorId: string, rating: number, review: string) {
+    try {
+      // Check if the patient has any prescriptions for the given doctor
+      const hasConsultedDoctor = await prescriptionModel.findOne({
+        patientId,
+        doctorId,
+      });
+  
+      if (!hasConsultedDoctor) {
+        throw new Error('You can only review a doctor after a consultation.');
+      }
+  
+      // Create a new review
+      const newReview = new reviewModel({
+        doctorId,
+        patientId,
+        rating,
+        review,
+      });
+  
+      // Save the review to the database
+      const savedReview = await newReview.save();
+  
+      // Optionally, you can update the doctor's average rating here
+      // const reviews = await reviewModel.find({ doctorId });
+      // const averageRating =reviews.reduce((sum: number, r: { rating: any; }) => sum + r.rating, 0) / reviews.length;
+    
+      return {
+        message: 'Review added successfully!',
+        review: savedReview,
+      };
+    } catch (error) {
+      console.log('error from addReviewAndRating frm patient repo',error);
+      
+    }
+  }
+  
 
 }
 
