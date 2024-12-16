@@ -4,6 +4,7 @@ import { Doctor } from '../models/doctorModel';
 import prescriptionModel, { IPrescription } from '../models/prescriptionModel';
 import VerificationRequest from '../models/verificationModel';
 import moment from 'moment';
+import reviewModel from '../models/reviewModel';
 
 class DoctorRepository {
   async findDoctorByEmail(email: string) {
@@ -115,7 +116,19 @@ class DoctorRepository {
       .populate('patientId', 'name email age gender location')
       .sort({ date: -1 }); // Sort by date in descending order
   }
-
+  async getReviews(doctorId: string) {
+    try {
+      const reviews = await reviewModel.find({ doctorId })
+        .populate('patientId', 'name email age gender location') 
+        .sort({ createdAt: -1 }); 
+  
+      return reviews; 
+    } catch (error) {
+      console.error("Error fetching reviews from doctor repo:", error);
+      throw new Error("Unable to fetch reviews. Please try again later.");
+    }
+  }
+  
 
 }
 

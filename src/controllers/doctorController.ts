@@ -16,14 +16,14 @@ class DoctorController {
     const { name, email } = req.body;
 
     try {
-      const doctor = await doctorRepository.googleAuth(name, email); 
-      if(doctor.status === 'Blocked'){
+      const doctor = await doctorRepository.googleAuth(name, email);
+      if (doctor.status === 'Blocked') {
         return res.status(403).json({ message: 'Your account has been blocked.' });
-      }     
+      }
       const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
       const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
       console.log('access token----', accessToken);
-      console.log('refresh token----', refreshToken);      
+      console.log('refresh token----', refreshToken);
       return res.status(200).json({ message: 'User authenticated', doctor });
     } catch (error) {
       console.error('Error processing Google authentication:', error);
@@ -77,7 +77,7 @@ class DoctorController {
     try {
       const { email, password } = req.body;
       const { doctor } = await doctorService.loginDoctor(email, password);
-      if(doctor.status === 'Blocked'){
+      if (doctor.status === 'Blocked') {
         return res.status(403).json({ message: 'Your account has been blocked.' });
       }
       const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
@@ -159,8 +159,8 @@ class DoctorController {
   async getProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const doctorId = req.user?.userId;
-      console.log('doctor id frm doc ctrlr',doctorId);
-      
+      console.log('doctor id frm doc ctrlr', doctorId);
+
       const doctor = await doctorRepository.findDoctorbyId(doctorId)
       if (!doctor) {
         return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Doctor not found' });
@@ -246,7 +246,7 @@ class DoctorController {
   async savePrescription(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const { symptoms, diagnosis, medications, patientId } = req.body;
-      const doctorId = req.user?.userId;       
+      const doctorId = req.user?.userId;
 
       if (!doctorId) {
         return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Doctor ID is missing.' });
@@ -264,17 +264,27 @@ class DoctorController {
   }
 
   async getPrescriptionsByDoctorId(req: CustomRequest, res: Response) {
-      try {
-        const doctorId = req.user?.userId;
-        const prescriptions = await doctorService.getPrescriptionsByDoctortId(doctorId)
-        res.status(HttpStatus.OK).json( prescriptions );
-      } catch (error: any) {
-        res.status(HttpStatus.BAD_REQUEST).json({
-          success: false,
-          message: error.message,
-        });
-      }
+    try {
+      const doctorId = req.user?.userId;
+      const prescriptions = await doctorService.getPrescriptionsByDoctortId(doctorId)
+      res.status(HttpStatus.OK).json(prescriptions);
+    } catch (error: any) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: error.message,
+      });
     }
+  }
+  async getReviewsByDoctorId(req: CustomRequest, res: Response) {
+    try {
+      const doctorId = req.user?.userId;
+      const reviews = await doctorService.getReviewsByDoctorId(doctorId);
+      res.status(HttpStatus.OK).json(reviews);
+    } catch (error: any) {
+      console.log('error fetching review from doc controller', error);
+    }
+  }
+
 
 }
 

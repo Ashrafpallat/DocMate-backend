@@ -61,7 +61,14 @@ class DoctorService {
   
       return prescriptions;
     }
+    async getReviewsByDoctorId(doctorId: string) {
+      if (!doctorId) {
+        throw new Error('Doctor ID is required');
+      }
+      const reviews = await doctorRepository.getReviews(doctorId);
+      return reviews;
+    }
+    
 }
 
-// Export an instance of the class
 export const doctorService = new DoctorService();
