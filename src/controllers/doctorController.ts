@@ -21,8 +21,6 @@ class DoctorController {
       }
       const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
       const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
-      console.log('access token----', accessToken);
-      console.log('refresh token----', refreshToken);
       return res.status(200).json({ message: 'User authenticated', doctor });
     } catch (error) {
       console.error('Error processing Google authentication:', error);

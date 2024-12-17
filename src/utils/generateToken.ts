@@ -5,6 +5,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'fallback-refresh-secret';
 
 export const generateAccessToken = (payload: object, res: Response): string => {
+    console.log('payload',payload);
+    
     const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' }); // Short-lived access token
     // Set the access token as an HTTP-only cookie
     res.cookie('accessToken', accessToken, {
@@ -31,7 +33,7 @@ export const generateRefreshToken = (payload: object, res: Response): string => 
     return refreshToken;
 };
 
-// Verify Token
+// Verify Token 
 export const verifyToken = (token: string, isRefreshToken: boolean = false): any => {
     try {
         const secret = isRefreshToken ? REFRESH_TOKEN_SECRET : JWT_SECRET;

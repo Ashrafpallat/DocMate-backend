@@ -11,17 +11,13 @@ class AdminService {
     if (password !== adminPassword) {
       throw new Error('Invalid email or password');
     }
-    const token = jwt.sign(
-      { email: adminEmail, role: 'admin' },
-      process.env.JWT_SECRET || 'fallback-secret', // Use a secret from environment variables
-      { expiresIn: '30d' } // Token expires in 30 days
-    );
     return {
       admin: {
+        userId: '123',
         email: adminEmail,
         name: 'DocMate Admin'
       },
-      token
+      
     };
   }
   async getAllPatients() {

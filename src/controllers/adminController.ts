@@ -2,20 +2,16 @@ import { Request, Response } from 'express';
 import { adminService } from '../services/adminService';
 import verificationRequestRepository from '../repositories/verificationRequestRepository';
 import { HttpStatus } from '../utils/HttpStatus'; // Import the HttpStatus enum
+import { generateAccessToken, generateRefreshToken } from '../utils/generateToken';
 
 class AdminController {
   async login(req: Request, res: Response): Promise<Response> {
     try {
       const { email, password } = req.body;
-
-      const { admin, token } = await adminService.loginAdmin(email, password);
-
-      res.cookie('token', token, {
-        httpOnly: true, // Cookie is only accessible by the server
-        secure: process.env.NODE_ENV === 'production', // Secure cookie in production (HTTPS)
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      });
-
+      const { admin } = await adminService.loginAdmin(email, password);
+      const accessToken = generateAccessToken({ userId: admin.userId, email: admin.email, name: admin.name }, res);
+      const refreshToken = generateRefreshToken({ userId: admin.userId, email: admin.email, name: admin.name }, res);
+     
       return res.status(HttpStatus.OK).json({ message: 'Admin login successful', admin });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
@@ -74,10 +70,21 @@ class AdminController {
 
   async logout(req: Request, res: Response): Promise<Response> {
     try {
-      res.cookie('token', '', {
+      res.cookie('accessToken', '', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV !== 'development',
         expires: new Date(0), // Expire immediately
+        sameSite: 'none',
+        path: '/', // Ensure the path is the same
+      });
+
+      // Clear the refresh token by setting an expired date and consistent properties
+      res.cookie('refreshToken', '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development',
+        expires: new Date(0), // Expire immediately
+        sameSite: 'none',
+        path: '/', // Ensure the path is the same
       });
 
       return res.status(HttpStatus.OK).json({ message: 'Logout successful' });
@@ -96,7 +103,7 @@ class AdminController {
 
   // Block/Unblock a doctor
   async updateDoctorStatus(req: Request, res: Response) {
-    try {      
+    try {
       const { doctorId } = req.params;
       const { status } = req.body;
 
