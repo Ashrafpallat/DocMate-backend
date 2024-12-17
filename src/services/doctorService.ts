@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { doctorRepository } from '../repositories/doctorRepository';
-import { DefaultToken } from '../models/defaultTokenModel';
+import { DefaultToken } from '../interfaces/defaultTokenInterface';
 
 class DoctorService {
   // Register a new doctor

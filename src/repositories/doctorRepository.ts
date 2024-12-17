@@ -1,10 +1,12 @@
 import mongoose from 'mongoose';
-import { DefaultToken, DefaultTokenModel } from '../models/defaultTokenModel';
+import {  DefaultTokenModel } from '../models/defaultTokenModel';
 import { Doctor } from '../models/doctorModel';
-import prescriptionModel, { IPrescription } from '../models/prescriptionModel';
+import prescriptionModel from '../models/prescriptionModel';
 import VerificationRequest from '../models/verificationModel';
 import moment from 'moment';
 import reviewModel from '../models/reviewModel';
+import { DefaultToken } from '../interfaces/defaultTokenInterface';
+import { IPrescription } from '../interfaces/prescriptionInterface';
 
 class DoctorRepository {
   async findDoctorByEmail(email: string) {

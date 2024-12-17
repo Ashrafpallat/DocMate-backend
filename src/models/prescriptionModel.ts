@@ -1,13 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
-
-export interface IPrescription extends Document {
-  symptoms: string;
-  diagnosis: string;
-  medications: string;
-  doctorId?: mongoose.Types.ObjectId;
-  patientId?: mongoose.Types.ObjectId;
-  date: Date;
-}
+import { IPrescription } from '../interfaces/prescriptionInterface';
 
 const prescriptionSchema = new Schema<IPrescription>({
   symptoms: { type: String, required: true },

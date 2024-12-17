@@ -1,14 +1,15 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import { Document } from 'mongoose';
 
 export interface DoctorDocument extends Document {
+  _id: string;  
   name: string;
   email: string;
   password: string;
   kycVerified: boolean;
-  locationName: string
+  locationName: string;
   location: {
-    type: string;
-    coordinates: [number, number]; // Array of numbers: [longitude, latitude]
+    type: string;  // 'Point'
+    coordinates: [number, number];  // [longitude, latitude]
   };
   experience: number;
   specialization: string;
@@ -17,4 +18,8 @@ export interface DoctorDocument extends Document {
   fees: number;
   profilePhoto: string;
   status: string;
+  createdAt: Date;
+  updatedAt: Date;
+
+  comparePassword(candidatePassword: string): Promise<boolean>;  
 }

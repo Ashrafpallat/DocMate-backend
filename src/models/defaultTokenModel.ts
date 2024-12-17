@@ -1,14 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { DefaultToken } from '../interfaces/defaultTokenInterface';
 
-type SlotStatus = 'issued' | 'reserved' | 'consulted' | 'cancelled';
-
-interface Slot {
-  start: string;
-  end: string;
-  status: SlotStatus;  
-  statusUpdatedAt: Date;
-  patientId?: mongoose.Schema.Types.ObjectId;  
-}
 
 const SlotSchema: Schema = new Schema({
   start: { type: String, required: true },
@@ -17,12 +9,6 @@ const SlotSchema: Schema = new Schema({
   statusUpdatedAt: { type: Date, default: Date.now },
   patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient', default: null }, 
 });
-
-export interface DefaultToken extends Document {
-  day: string;
-  slots: Slot[];  
-  doctorId: mongoose.Schema.Types.ObjectId; 
-}
 
 const DefaultTokenSchema: Schema = new Schema({
   day: { type: String, required: true },  

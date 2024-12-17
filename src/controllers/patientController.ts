@@ -7,12 +7,11 @@ import cloudinary from '../config/cloudinery';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import { HttpStatus } from '../utils/HttpStatus'; // Import the HttpStatus enum
+import { CustomRequest } from '../interfaces/customRequest';
 
 dotenv.config();
 
-interface CustomRequest extends Request {
-  user?: String | any
-}
+
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-09-30.acacia',

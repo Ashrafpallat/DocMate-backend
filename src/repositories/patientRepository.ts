@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
-import { DefaultToken, DefaultTokenModel } from '../models/defaultTokenModel';
+import {  DefaultTokenModel } from '../models/defaultTokenModel';
 import { Doctor } from '../models/doctorModel';
 import { Patient } from '../models/patientModel';
 import moment from 'moment';
 import prescriptionModel from '../models/prescriptionModel';
 import reviewModel from '../models/reviewModel';
+import { DefaultToken } from '../interfaces/defaultTokenInterface';
 
 class PatientRepository {
   async findPatientByEmail(email: string) {

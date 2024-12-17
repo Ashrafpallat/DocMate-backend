@@ -6,10 +6,9 @@ import VerificationRequest from '../models/verificationModel';
 import cloudinary from '../config/cloudinery';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateToken';
 import { HttpStatus } from '../utils/HttpStatus'; // Import the HttpStatus enum
+import { CustomRequest } from '../interfaces/customRequest';
 
-interface CustomRequest extends Request {
-  user?: String | any
-}
+
 class DoctorController {
 
   async googleAuth(req: Request, res: Response): Promise<Response> {
