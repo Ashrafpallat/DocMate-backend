@@ -7,6 +7,7 @@ import cloudinary from '../config/cloudinery';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateToken';
 import { HttpStatus } from '../utils/HttpStatus'; // Import the HttpStatus enum
 import { CustomRequest } from '../interfaces/customRequest';
+import { Messages } from '../utils/doctorMessages';
 
 
 class DoctorController {
@@ -17,14 +18,14 @@ class DoctorController {
     try {
       const doctor = await doctorRepository.googleAuth(name, email);
       if (doctor.status === 'Blocked') {
-        return res.status(403).json({ message: 'Your account has been blocked.' });
+        return res.status(403).json({ message: Messages.Errors.ACCOUNT_BLOCKED });
       }
       const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
       const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
-      return res.status(200).json({ message: 'User authenticated', doctor });
+      return res.status(200).json({ message: Messages.Doctor.AUTH_SUCCESS, doctor });
     } catch (error) {
       console.error('Error processing Google authentication:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   };
 
@@ -61,12 +62,12 @@ class DoctorController {
       });
 
       return res.status(HttpStatus.CREATED).json({
-        message: 'Doctor registered successfully',
+        message: Messages.Doctor.SIGNUP_SUCCESS,
         doctor: newDoctor,
       });
     } catch (error) {
       console.log('error occured during signup', error);
-      return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Internal server error' });
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   };
 
@@ -75,13 +76,13 @@ class DoctorController {
       const { email, password } = req.body;
       const { doctor } = await doctorService.loginDoctor(email, password);
       if (doctor.status === 'Blocked') {
-        return res.status(403).json({ message: 'Your account has been blocked.' });
+        return res.status(403).json({ message: Messages.Errors.ACCOUNT_BLOCKED });
       }
       const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
       const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
 
       // Return success response with the doctor and token
-      return res.status(HttpStatus.OK).json({ message: 'Login successful', doctor });
+      return res.status(HttpStatus.OK).json({ message: Messages.Doctor.LOGIN_SUCCESS, doctor });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
     }
@@ -105,9 +106,9 @@ class DoctorController {
         path: '/', // Ensure the path is the same
       });
 
-      return res.status(HttpStatus.OK).json({ message: 'Logout successful' });
+      return res.status(HttpStatus.OK).json({ message: Messages.Doctor.LOGOUT_SUCCESS });
     } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error', error });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR, error });
     }
   }
   async verifyDoctor(req: CustomRequest, res: Response): Promise<Response> {
@@ -115,7 +116,7 @@ class DoctorController {
     const proofFile = req.file; // Access the uploaded file from the request
 
     if (!proofFile) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Proof file is required' });
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: Messages.Errors.PROOF_FILE_REQUIRED });
     }
 
     try {
@@ -137,10 +138,10 @@ class DoctorController {
       // Save verification data to the database
       const verification = await this.saveVerificationData(verificationData);
 
-      return res.status(HttpStatus.CREATED).json({ message: 'Verification request submitted successfully', verification });
+      return res.status(HttpStatus.CREATED).json({ message: Messages.Doctor.VERIFICATION_REQUEST_SUCCESS, verification });
     } catch (error) {
       console.error('Error during verification:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
 
@@ -160,23 +161,22 @@ class DoctorController {
 
       const doctor = await doctorRepository.findDoctorbyId(doctorId)
       if (!doctor) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Doctor not found' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: Messages.Errors.DOCTOR_NOT_FOUND });
       }
 
       return res.status(HttpStatus.OK).json(doctor);
     } catch (error) {
       console.error('Error fetching doctor profile:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
   async updateProfile(req: CustomRequest, res: Response): Promise<Response> {
     try {
       console.log('update profile', req.file);
-
-      const doctorId = req.user?.userId; // Assuming req.user has the authenticated doctorI      
+      const doctorId = req.user?.userId;  
       const doctor = await doctorRepository.findDoctorbyId(doctorId);
       if (!doctor) {
-        return res.status(HttpStatus.NOT_FOUND).json({ message: 'Doctor not found' });
+        return res.status(HttpStatus.NOT_FOUND).json({ message: Messages.Errors.DOCTOR_NOT_FOUND });
       }
       let profilePhoto = req.file ? req.file.path : doctor.profilePhoto
       console.log('profilephoto', profilePhoto);
@@ -206,7 +206,7 @@ class DoctorController {
       return res.status(HttpStatus.OK).json(updatedDoctor);
     } catch (error) {
       console.error('Error updating doctor profile:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
 
@@ -218,12 +218,12 @@ class DoctorController {
       const defaultTokens = await doctorService.saveDefaultTokens(selectedDay, slots, doctorId);
 
       return res.status(HttpStatus.OK).json({
-        message: `Default tokens for ${selectedDay} saved successfully`,
+        message: Messages.Doctor.DEFAULT_TOKENS_SAVED(selectedDay),
         defaultTokens
       });
     } catch (error) {
       console.error('Error saving default tokens:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
   async getDoctorSlots(req: CustomRequest, res: Response): Promise<void> {
@@ -236,7 +236,7 @@ class DoctorController {
       res.status(HttpStatus.OK).json(slots);
     } catch (error) {
       console.error('Error fetching slots:', error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error || 'Server error. Could not fetch slots.' });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   };
 
@@ -246,17 +246,17 @@ class DoctorController {
       const doctorId = req.user?.userId;
 
       if (!doctorId) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Doctor ID is missing.' });
+        return res.status(HttpStatus.BAD_REQUEST).json({ message: Messages.Errors.DOCTOR_ID_MISSING });
       }
 
       const prescription = await doctorRepository.savePrescription(symptoms, diagnosis, medications, doctorId, patientId);
       return res.status(HttpStatus.CREATED).json({
-        message: 'Prescription saved successfully',
+        message: Messages.Doctor.PRESCRIPTION_SAVED,
         prescription,
       });
     } catch (error) {
       console.error('Error saving prescription:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
 

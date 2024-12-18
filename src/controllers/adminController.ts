@@ -3,6 +3,7 @@ import { adminService } from '../services/adminService';
 import verificationRequestRepository from '../repositories/verificationRequestRepository';
 import { HttpStatus } from '../utils/HttpStatus'; // Import the HttpStatus enum
 import { generateAccessToken, generateRefreshToken } from '../utils/generateToken';
+import { Messages } from '../utils/adminMessages';
 
 class AdminController {
   async login(req: Request, res: Response): Promise<Response> {
@@ -12,7 +13,7 @@ class AdminController {
       const accessToken = generateAccessToken({ userId: admin.userId, email: admin.email, name: admin.name }, res);
       const refreshToken = generateRefreshToken({ userId: admin.userId, email: admin.email, name: admin.name }, res);
      
-      return res.status(HttpStatus.OK).json({ message: 'Admin login successful', admin });
+      return res.status(HttpStatus.OK).json({ message: Messages.Admin.LOGIN_SUCCESS, admin });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
     }
@@ -24,7 +25,7 @@ class AdminController {
       return res.status(HttpStatus.OK).json(pendingRequests);
     } catch (error) {
       console.error('Error fetching pending verifications:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
 
@@ -34,12 +35,12 @@ class AdminController {
     try {
       const approvedRequest = await verificationRequestRepository.approveRequest(id);
       if (!approvedRequest) {
-        return res.status(HttpStatus.NOT_FOUND).json({ message: 'Verification request not found' });
+        return res.status(HttpStatus.NOT_FOUND).json({ message: Messages.Errors.VERIFICATION_NOT_FOUND });
       }
-      return res.status(HttpStatus.OK).json({ message: 'Doctor approved successfully', approvedRequest });
+      return res.status(HttpStatus.OK).json({ message: Messages.Admin.DOCTOR_APPROVED_SUCCESS, approvedRequest });
     } catch (error) {
       console.error('Error approving verification:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
   async getAllPatients(req: Request, res: Response): Promise<Response> {
@@ -48,7 +49,7 @@ class AdminController {
       return res.status(HttpStatus.OK).json(patients);
     } catch (error) {
       console.error('Error fetching patients:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
 
@@ -59,12 +60,12 @@ class AdminController {
     try {
       const updatedPatient = await adminService.updatePatientStatus(patientId, status);
       if (!updatedPatient) {
-        return res.status(HttpStatus.NOT_FOUND).json({ message: 'Patient not found' });
+        return res.status(HttpStatus.NOT_FOUND).json({ message: Messages.Errors.PATIENT_NOT_FOUND });
       }
-      return res.status(HttpStatus.OK).json({ message: 'Patient status updated successfully', updatedPatient });
+      return res.status(HttpStatus.OK).json({ message: Messages.Admin.PATIENT_STATUS_UPDATED, updatedPatient });
     } catch (error) {
       console.error('Error updating patient status:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
 
@@ -87,9 +88,9 @@ class AdminController {
         path: '/', // Ensure the path is the same
       });
 
-      return res.status(HttpStatus.OK).json({ message: 'Logout successful' });
+      return res.status(HttpStatus.OK).json({ message: Messages.Admin.LOGOUT_SUCCESS });
     } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error', error });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR, error });
     }
   }
   async getAllDoctors(req: Request, res: Response) {
@@ -97,7 +98,7 @@ class AdminController {
       const doctors = await adminService.fetchAllDoctors();
       res.status(200).json(doctors);
     } catch (error) {
-      res.status(500).json({ message: 'Failed to fetch doctors', error });
+      res.status(500).json({ message: Messages.Errors.FAILED_TO_FETCH_DOCTORS, error });
     }
   }
 
@@ -110,12 +111,12 @@ class AdminController {
       const updatedDoctor = await adminService.updateDoctorStatus(doctorId, status);
 
       if (!updatedDoctor) {
-        return res.status(404).json({ message: 'Doctor not found' });
+        return res.status(404).json({ message: Messages.Errors.DOCTOR_NOT_FOUND });
       }
 
       res.status(200).json({ message: `Doctor ${updatedDoctor.status === 'Active' ? 'unblocked' : 'Blocked'} successfully`, doctor: updatedDoctor });
     } catch (error) {
-      res.status(500).json({ message: 'Failed to update doctor status', error });
+      res.status(500).json({ message: Messages.Errors.FAILED_TO_UPDATE_DOCTOR_STATUS, error });
     }
   }
 }

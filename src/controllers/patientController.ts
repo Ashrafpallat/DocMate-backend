@@ -8,6 +8,7 @@ import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import { HttpStatus } from '../utils/HttpStatus'; // Import the HttpStatus enum
 import { CustomRequest } from '../interfaces/customRequest';
+import { Messages } from '../utils/patientMessages';
 
 dotenv.config();
 
@@ -23,13 +24,13 @@ class PatientController {
     try {
       const { refreshToken } = req.cookies;
       if (!refreshToken) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'No refresh token provided' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: Messages.Errors.NO_REFRESH_TOKEN });
       }
       const decoded = verifyToken(refreshToken, true); // Verify the refresh token
       const accessToken = generateAccessToken({ userId: decoded.userId, email: decoded.email, name: decoded.name }, res);
-      return res.status(HttpStatus.OK).json({ message: 'New access token issued' });
+      return res.status(HttpStatus.OK).json({ message: Messages.Success.NEW_ACCESSTOKEN });
     } catch (error: any) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Invalid or expired refresh token' });
+      return res.status(HttpStatus.UNAUTHORIZED).json({ message: Messages.Errors.INVALID_REFRESH_TOKEN });
     }
   }
 
@@ -38,14 +39,14 @@ class PatientController {
     try {
       const patient = await patientRepository.googleAuth(name, email);
       if(patient.status === 'Blocked'){
-        return res.status(403).json({ message: 'Your account has been blocked.' });
+        return res.status(403).json({ message: Messages.Errors.ACCOUNT_BLOCKED });
       }
       generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
       generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
       return res.status(HttpStatus.OK).json({ message: 'User authenticated', patient });
     } catch (error) {
       console.error('Error processing Google authentication:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
 
@@ -62,7 +63,7 @@ class PatientController {
         location,
       });
 
-      return res.status(HttpStatus.CREATED).json({ message: 'User registered successfully', newPatient });
+      return res.status(HttpStatus.CREATED).json({ message: Messages.Success.USER_REGISTERED, newPatient });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
     }
@@ -74,12 +75,12 @@ class PatientController {
       const { email, password } = req.body;
       const { patient } = await patientService.loginPatient(email, password);
       if(patient.status === 'Blocked'){
-        return res.status(403).json({ message: 'Your account has been blocked.' });
+        return res.status(403).json({ message: Messages.Errors.ACCOUNT_BLOCKED });
       }
       const accessToken = generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
       const refreshToken = generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
 
-      return res.status(HttpStatus.OK).json({ message: 'Login successful', patient });
+      return res.status(HttpStatus.OK).json({ message: Messages.Success.LOGIN_SUCCESSFUL, patient });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
     }
@@ -92,14 +93,14 @@ class PatientController {
 
       const patient = await patientRepository.findPatientById(patientId)
       if (!patient) {
-        console.log('patient not found');
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'patient not found' });
+        console.log(Messages.Errors.PATIENT_NOT_FOUND);
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: Messages.Errors.PATIENT_NOT_FOUND });
       }
 
       return res.status(HttpStatus.OK).json(patient);
     } catch (error) {
       console.error('Error fetching patient profile:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
   async updateProfile(req: CustomRequest, res: Response): Promise<Response> {
@@ -107,7 +108,7 @@ class PatientController {
       const patientId = req.user?.userId;    
       const patient = await patientRepository.findPatientById(patientId);
       if (!patient) {
-        return res.status(HttpStatus.NOT_FOUND).json({ message: 'patient not found' });
+        return res.status(HttpStatus.NOT_FOUND).json({ message: Messages.Errors.PATIENT_NOT_FOUND });
       }
       let profilePhoto = req.file ? req.file.path : patient.profilePhoto
       console.log('profilephoto', profilePhoto);
@@ -134,19 +135,19 @@ class PatientController {
       return res.status(HttpStatus.OK).json(updatedDoctor);
     } catch (error) {
       console.error('Error updating doctor profile:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
   async getDoctorsNearby(req: Request, res: Response): Promise<Response> {
     try {
       const { lat, lng, page = 1, limit = 3 } = req.query; // Default to page 1 and limit 3
       if (!lat || !lng) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Latitude and longitude are required' });
+        return res.status(HttpStatus.BAD_REQUEST).json({ message: Messages.Errors.INVALID_LAT_LNG });
       }
       const latitude = parseFloat(lat as string);
       const longitude = parseFloat(lng as string);
       if (isNaN(latitude) || isNaN(longitude)) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid latitude or longitude' });
+        return res.status(HttpStatus.BAD_REQUEST).json({ message: Messages.Errors.INVALID_LAT_LNG });
       }
 
       // Convert page and limit to numbers
@@ -157,7 +158,7 @@ class PatientController {
       return res.status(HttpStatus.OK).json({ doctors, totalCount });
     } catch (error) {
       console.error('Error fetching nearby doctors:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
 
@@ -185,9 +186,9 @@ class PatientController {
       });
 
       console.log('Logout successful');
-      return res.status(HttpStatus.OK).json({ message: 'Logout successful' });
+      return res.status(HttpStatus.OK).json({ message: Messages.Success.LOGOUT_SUCCESSFUL });
     } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error', error });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR, error });
     }
   }
 
@@ -197,14 +198,14 @@ class PatientController {
       const patientId = req.user?.userId;
 
       if (!patientId) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Authentication required' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: Messages.Errors.AUTHENTICATION_REQUIRED });
       }
       const reservedSlot = await patientRepository.reserveSlot(doctorId, day, slotIndex, patientId);
 
       return res.status(HttpStatus.OK).json({ message: 'Slot reserved successfully', reservedSlot });
     } catch (error: any) {
       console.error('Error reserving slot:', error);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message || 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message || Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
   async createPaymentSession(req: Request, res: Response) {
@@ -242,7 +243,7 @@ class PatientController {
       const patientId = req.user?.userId;
 
       if (!patientId) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Authentication required' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: Messages.Errors.AUTHENTICATION_REQUIRED });
       }
 
       // Fetch the patient's pending appointments from the service
@@ -252,10 +253,10 @@ class PatientController {
       //   return res.status(HttpStatus.NOT_FOUND).json({ message: 'No appointments found' });
       // }
 
-      return res.status(HttpStatus.OK).json({ message: 'Appointments fetched successfully', appointments });
+      return res.status(HttpStatus.OK).json({ message: Messages.Success.APPOINTMENTS_FETCHED, appointments });
     } catch (error: any) {
       console.error('Error fetching appointments:', error.message);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message || 'Server error' });
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message || Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
   async getPrescriptionsByPatientId(req: CustomRequest, res: Response) {
@@ -276,7 +277,7 @@ class PatientController {
     const patientId = req.user?.userId;
     const {doctorId, rating, reviewText} = req.body    
     await patientService.addReviewAndRating(patientId, doctorId, rating, reviewText)
-    return res.status(HttpStatus.OK).json({ message: 'review added successfully' });
+    return res.status(HttpStatus.OK).json({ message: Messages.Success.REVIEW_ADDED });
   }
 
 }
