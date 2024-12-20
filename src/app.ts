@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import doctorRoutes from './routes/doctorRoutes';
 import patientRoutes from './routes/patientRoutes';
+import chatRoutes from './routes/ChatRoutes';
 import dotenv from 'dotenv';
 import cors from 'cors'
 import adminRouter from './routes/adminRoutes';
@@ -23,7 +24,7 @@ app.use(express.json());
 app.use('/api/admin', adminRouter);
 app.use('/api/doctor', doctorRoutes);
 app.use('/api/patient', patientRoutes);
-
+app.use('/api/chat', chatRoutes)
 
 // Connect to MongoDB
 mongoose

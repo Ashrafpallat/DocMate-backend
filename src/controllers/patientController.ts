@@ -175,7 +175,7 @@ class PatientController {
         sameSite: 'none',
         path: '/', // Ensure the path is the same
       });
-
+ 
       // Clear the refresh token by setting an expired date and consistent properties
       res.cookie('refreshToken', '', {
         httpOnly: true,

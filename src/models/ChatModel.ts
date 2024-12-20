@@ -1,15 +1,7 @@
-import { Document, Schema, Types } from "mongoose";
+import { Document, model, Schema, Types } from "mongoose";
+import { IChat } from "../interfaces/ChatInterface";
 
-export interface IChat extends Document {
-  patient: Types.ObjectId;
-  doctor: Types.ObjectId;
-  lastMessage: string;
-  lastMessageTime: Date | null;
-  patientLastSeen: Date | null;
-  doctorLastSeen: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
+
 
 const ChatSchema = new Schema<IChat>(
   {
@@ -22,3 +14,4 @@ const ChatSchema = new Schema<IChat>(
   },
   { timestamps: true }
 );
+export const Chat = model<IChat>('Chat', ChatSchema);
