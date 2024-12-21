@@ -12,6 +12,9 @@ import { chatRepository } from "../repositories/ChatRespository";
   async sendMessage(chatId:string, sender:string, senderRole:string,receiver:string, content:string){
     return await chatRepository.sendMessage(chatId, sender, senderRole, receiver, content)
   }
+  async getMessages(chatId: string){
+    return await chatRepository.getMessages(chatId)
+  }
 }; 
 
 export const chatService = new ChatService();

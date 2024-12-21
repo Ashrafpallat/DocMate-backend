@@ -21,29 +21,42 @@ class ChatRepository {
   async fetchOrCreateChat(user1: string, user2: string): Promise<IChat> {
     let patient = await Patient.findById(user1);
     let doctor = await Doctor.findById(user2);
-
     if (!patient) {
       patient = await Patient.findById(user2);
       doctor = await Doctor.findById(user1);
     }
-
     if (!patient) {
       throw new Error("Neither user1 nor user2 is a valid patient");
     }
     if (!doctor) {
       throw new Error("Doctor not found");
     }
-
     let chat = await Chat.findOne({
       patient: patient._id,
-      doctor: doctor._id
+      doctor: doctor._id,
+    }).populate({
+      path: "lastMessage", // Populate the lastMessage field
+      populate: {
+        path: "sender", // Nested populate to get sender details
+        select: "name profilePhoto", // Select only necessary fields
+      },
     });
-
     if (!chat) {
       chat = await Chat.create({
         patient: patient._id,
         doctor: doctor._id,
       });
+
+      chat = await Chat.findById(chat._id).populate({
+        path: "lastMessage",
+        populate: {
+          path: "sender",
+          select: "name profilePhoto",
+        },
+      });
+      if (!chat) {
+        throw new Error("Chat not found after creation");
+      }
     }
 
     return chat;
@@ -57,8 +70,22 @@ class ChatRepository {
       content
     }
     const message = await Message.create(newMessage)
+    await Chat.findByIdAndUpdate(chatId, {
+      lastMessage: message._id,
+      lastMessageTime: new Date(),
+    });
     return message
   }
+  async getMessages(chatId: string) {
+    const messages = await Message.find({ chatId })
+      .populate({
+        path: "sender",
+        select: "name profilePhoto", 
+      });
+  
+    return messages;
+  }
+  
 
 }
 

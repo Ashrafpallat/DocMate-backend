@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 export interface IChat extends Document {
     patient: Types.ObjectId;
     doctor: Types.ObjectId;
-    lastMessage: string;
+    lastMessage: Types.ObjectId;
     lastMessageTime: Date | null;
     patientLastSeen: Date | null;
     doctorLastSeen: Date | null;

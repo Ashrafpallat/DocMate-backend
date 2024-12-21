@@ -45,5 +45,14 @@ import { CustomRequest } from "../interfaces/customRequest";
       console.log('error sending meesage controler', error);
     }
   }
+  async getMessages(req: CustomRequest, res: Response){
+    try {
+      const chatId = req.params.chatId      
+      const messages = await chatService.getMessages(chatId)
+      return res.status(200).json(messages)
+    } catch (error) {
+      console.log('error fetching messages',error);
+    }
+  }
 };
 export const chatController = new ChatController();
