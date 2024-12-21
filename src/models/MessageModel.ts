@@ -1,4 +1,4 @@
-import { Document, Schema, Types } from "mongoose";
+import { Document, model, Schema, Types } from "mongoose";
 
 export interface IMessage extends Document {
   chatId: Types.ObjectId; 
@@ -24,3 +24,4 @@ const MessageSchema = new Schema<IMessage>(
   },
   { timestamps: true }
 );
+export const Message = model<IMessage>('Message', MessageSchema);

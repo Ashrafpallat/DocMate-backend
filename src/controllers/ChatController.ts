@@ -4,11 +4,12 @@ import { CustomRequest } from "../interfaces/customRequest";
 
 
  class ChatController {
-  // Get all chats for a user
   async getUserChats(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const userId = req.user?.userId;
       const userRole = req.user?.role
+      console.log('req.user', req.user);
+      
       if (!userId || !userRole) {
         throw new Error("User ID or role is missing.");
       }      
@@ -20,7 +21,6 @@ import { CustomRequest } from "../interfaces/customRequest";
     }
   }
 
-  // Get a specific chat between a patient and a doctor, or create one if it doesn't exist
   async fetchOrCreateChat(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const { user1 } = req.body; 
@@ -30,6 +30,19 @@ import { CustomRequest } from "../interfaces/customRequest";
     } catch (error) {
       console.error("Error fetching or creating chat:", error);
       return res.status(500).json({ error: "Failed to fetch or create chat" });
+    }
+  }
+  async sendMessage(req: CustomRequest,res: Response){
+    try {
+      const sender = req.user?.userId
+      const senderRole = req.user?.role
+      const {chatId, receiver, content} = req.body
+      console.log('req.body',req.body);
+      
+      const message = await chatService.sendMessage(chatId, sender, senderRole, receiver, content)
+      return res.status(200).json(message)
+    } catch (error) {
+      console.log('error sending meesage controler', error);
     }
   }
 };
