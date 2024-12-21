@@ -3,8 +3,8 @@ import { chatRepository } from "../repositories/ChatRespository";
 
  class ChatService  {
   // Fetch all chats for a user
-  async getChatsForUser(userId: string): Promise<IChat[]> {
-    return await chatRepository.fetchChatsByUserId(userId);
+  async getChatsForUser(userId: string, userRole: string): Promise<IChat[]> {
+    return await chatRepository.fetchChatsByUserId(userId, userRole);
   }
 
   // Fetch a specific chat between a patient and a doctor, or create one if it doesn't exist

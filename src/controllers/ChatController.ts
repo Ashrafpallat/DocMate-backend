@@ -5,10 +5,14 @@ import { CustomRequest } from "../interfaces/customRequest";
 
  class ChatController {
   // Get all chats for a user
-  async getUserChats(req: Request, res: Response): Promise<Response> {
+  async getUserChats(req: CustomRequest, res: Response): Promise<Response> {
     try {
-      const { userId } = req.params; 
-      const chats = await chatService.getChatsForUser(userId);
+      const userId = req.user?.userId;
+      const userRole = req.user?.role
+      if (!userId || !userRole) {
+        throw new Error("User ID or role is missing.");
+      }      
+      const chats = await chatService.getChatsForUser(userId, userRole);
       return res.status(200).json(chats);
     } catch (error) {
       console.error("Error fetching chats:", error);

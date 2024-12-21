@@ -11,6 +11,7 @@ export interface PatientDocument extends Document {
   location: string;
   status: 'Active' | 'Blocked';
   profilePhoto?: string;  // Making profilePhoto optional
+  role: string
   createdAt?: Date;
   updatedAt?: Date;
 

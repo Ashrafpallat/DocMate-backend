@@ -18,6 +18,7 @@ export interface DoctorDocument extends Document {
   fees: number;
   profilePhoto: string;
   status: string;
+  role: string
   createdAt: Date;
   updatedAt: Date;
 

@@ -25,6 +25,10 @@ const doctorSchema = new Schema<DoctorDocument>(
     fees: { type: Number },
     profilePhoto: { type: String },
     status: { type: String, default: 'Active' },
+    role: {
+      type: String,
+      default: 'doctor', // Set default role as 'patient'
+    },
   },
   { timestamps: true }
 );

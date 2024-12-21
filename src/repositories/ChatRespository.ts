@@ -4,14 +4,16 @@ import { Patient } from '../models/patientModel';
 import { Doctor } from '../models/doctorModel';
 
 class ChatRepository {
-  // Fetch chats by user ID (patient or doctor)
-  async fetchChatsByUserId(userId: string): Promise<IChat[]> {
-    return await Chat.find({
+  async fetchChatsByUserId(userId: string, userRole:string): Promise<IChat[]> {
+    const query = {
       $or: [{ patient: userId }, { doctor: userId }],
-    })
-    .sort({ updatedAt: -1 }) // Sort by latest update
-    .populate('patient', 'name email') // Populate patient details
-    .populate('doctor', 'name email'); // Populate doctor details
+    };
+  
+    const chats = await Chat.find(query)
+      .sort({ updatedAt: -1 }) 
+      .populate(userRole === 'patient' ? 'doctor' : 'patient', 'name profilePhoto');
+  
+    return chats;
   }
 
   // Fetch or create a chat by patient and doctor IDs

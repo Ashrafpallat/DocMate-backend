@@ -27,7 +27,7 @@ class PatientController {
         return res.status(HttpStatus.UNAUTHORIZED).json({ message: Messages.Errors.NO_REFRESH_TOKEN });
       }
       const decoded = verifyToken(refreshToken, true); // Verify the refresh token
-      const accessToken = generateAccessToken({ userId: decoded.userId, email: decoded.email, name: decoded.name }, res);
+      const accessToken = generateAccessToken({ userId: decoded.userId, email: decoded.email, name: decoded.name, role: decoded.role }, res);
       return res.status(HttpStatus.OK).json({ message: Messages.Success.NEW_ACCESSTOKEN });
     } catch (error: any) {
       return res.status(HttpStatus.UNAUTHORIZED).json({ message: Messages.Errors.INVALID_REFRESH_TOKEN });
@@ -41,8 +41,8 @@ class PatientController {
       if(patient.status === 'Blocked'){
         return res.status(403).json({ message: Messages.Errors.ACCOUNT_BLOCKED });
       }
-      generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
-      generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
+      generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name, role: patient.role }, res);
+      generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name, role: patient.role }, res);
       return res.status(HttpStatus.OK).json({ message: 'User authenticated', patient });
     } catch (error) {
       console.error('Error processing Google authentication:', error);
@@ -77,8 +77,8 @@ class PatientController {
       if(patient.status === 'Blocked'){
         return res.status(403).json({ message: Messages.Errors.ACCOUNT_BLOCKED });
       }
-      const accessToken = generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
-      const refreshToken = generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name }, res);
+      const accessToken = generateAccessToken({ userId: patient._id, email: patient.email, name: patient.name, role: patient.role }, res);
+      const refreshToken = generateRefreshToken({ userId: patient._id, email: patient.email, name: patient.name, role: patient.role }, res);
 
       return res.status(HttpStatus.OK).json({ message: Messages.Success.LOGIN_SUCCESSFUL, patient });
     } catch (error: any) {

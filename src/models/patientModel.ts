@@ -11,6 +11,10 @@ const patientSchema = new Schema<PatientDocument>({
   status: { type: String, default: 'Active' },
   profilePhoto: {type: String},
   password: { type: String, },
+  role: {
+    type: String,
+    default: 'patient', // Set default role as 'patient'
+  },
   createdAt: { type: Date, default: Date.now }
 });
 

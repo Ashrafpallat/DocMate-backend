@@ -20,8 +20,8 @@ class DoctorController {
       if (doctor.status === 'Blocked') {
         return res.status(403).json({ message: Messages.Errors.ACCOUNT_BLOCKED });
       }
-      const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
-      const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
+      const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name, role: doctor.role }, res);
+      const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name, role: doctor.role }, res);
       return res.status(200).json({ message: Messages.Doctor.AUTH_SUCCESS, doctor });
     } catch (error) {
       console.error('Error processing Google authentication:', error);
@@ -78,8 +78,8 @@ class DoctorController {
       if (doctor.status === 'Blocked') {
         return res.status(403).json({ message: Messages.Errors.ACCOUNT_BLOCKED });
       }
-      const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
-      const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name }, res);
+      const accessToken = generateAccessToken({ userId: doctor._id, email: doctor.email, name: doctor.name, role: doctor.role }, res);
+      const refreshToken = generateRefreshToken({ userId: doctor._id, email: doctor.email, name: doctor.name, role: doctor.role }, res);
 
       // Return success response with the doctor and token
       return res.status(HttpStatus.OK).json({ message: Messages.Doctor.LOGIN_SUCCESS, doctor });
