@@ -25,8 +25,7 @@ import { CustomRequest } from "../interfaces/customRequest";
     try {
       const { user1 } = req.body; 
       const user2 = req.user?.userId;
-      console.log('user1-', user1, 'user2-',user2);
-    
+      
       const chat = await chatService.getOrCreateChat(user1, user2);
       return res.status(200).json(chat);
     } catch (error) {

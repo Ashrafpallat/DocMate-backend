@@ -115,7 +115,7 @@ class DoctorRepository {
   }
   async getPrescriptionsByDoctorId(doctorId: string) {
     return await prescriptionModel.find({ doctorId })
-      .populate('patientId', 'name email age gender location')
+      .populate('patientId', 'name email age gender location profilePhoto')
       .sort({ date: -1 }); // Sort by date in descending order
   }
   async getReviews(doctorId: string) {
