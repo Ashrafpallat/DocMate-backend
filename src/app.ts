@@ -60,6 +60,7 @@ io.on('connection', (socket) => {
     socket.join(chatId);
     console.log(`User joined room: ${chatId}`);
   });
+  
   socket.on('leaveRoom', (chatId) => {
     socket.leave(chatId);
     console.log(`User left room: ${chatId}`);
