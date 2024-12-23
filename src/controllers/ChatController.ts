@@ -7,9 +7,7 @@ import { CustomRequest } from "../interfaces/customRequest";
   async getUserChats(req: CustomRequest, res: Response): Promise<Response> {
     try {
       const userId = req.user?.userId;
-      const userRole = req.user?.role
-      console.log('req.user', req.user);
-      
+      const userRole = req.user?.role      
       if (!userId || !userRole) {
         throw new Error("User ID or role is missing.");
       }      
@@ -45,10 +43,12 @@ import { CustomRequest } from "../interfaces/customRequest";
     } catch (error) {
       console.log('error sending meesage controler', error);
     }
-  }
+  } 
   async getMessages(req: CustomRequest, res: Response){
     try {
-      const chatId = req.params.chatId      
+      const chatId = req.params.chatId    
+      console.log('chatid from controler',chatId);
+        
       const messages = await chatService.getMessages(chatId)
       return res.status(200).json(messages)
     } catch (error) {
