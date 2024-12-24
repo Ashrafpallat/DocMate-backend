@@ -227,8 +227,8 @@ class PatientController {
           },
         ],
         mode: 'payment',
-        success_url: `${process.env.FRONTEND_URL}/payment-success?doctorId=${doctorId}&day=${day}&slotIndex=${slotIndex}`,
-        cancel_url: `${process.env.FRONTEND_URL}/payment-failed`,
+        success_url: `${process.env.FRONTEND_URL}/patient/payment-success?doctorId=${doctorId}&day=${day}&slotIndex=${slotIndex}`,
+        cancel_url: `${process.env.FRONTEND_URL}/patient/payment-failed`,
       });
 
       res.json({ sessionId: session.id });
