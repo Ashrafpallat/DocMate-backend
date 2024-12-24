@@ -55,28 +55,38 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
+
   // Join chat rooms
   socket.on('joinRoom', (chatId) => {
     socket.join(chatId);
     console.log(`User joined room: ${chatId}`);
   });
-  
+
   socket.on('leaveRoom', (chatId) => {
     socket.leave(chatId);
     console.log(`User left room: ${chatId}`);
   });
+
+  // Listen for a typing event
+  socket.on('typing', (chatId) => {
+    socket.to(chatId).emit('typing', socket.id); // Broadcast "typing" event to the room
+  });
+
+  // Listen for a stopTyping event
+  socket.on('stopTyping', (chatId) => {
+    socket.to(chatId).emit('stopTyping', socket.id); // Broadcast "stopTyping" event to the room
+  });
+
   // Listen for a message from the client
   socket.on('sendMessage', (data) => {
     console.log('Message received:', data);
 
-    // Broadcast message to the specific chat room
-    // io.in(data.chatId).emit('receiveMessage', data);
-
-    // Emit the message to everyone in the room except the sender
+    // Broadcast the message to the specific chat room
     socket.to(data.chatId).emit('receiveMessage', data);
   });
+
   // Handle disconnection
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });
-});  
+});
