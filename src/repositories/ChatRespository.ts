@@ -11,8 +11,9 @@ class ChatRepository {
     };
 
     const chats = await Chat.find(query)
-      .sort({ updatedAt: -1 })
-      .populate(userRole === 'patient' ? 'doctor' : 'patient', 'name profilePhoto');
+    .sort({ updatedAt: -1 })
+    .populate(userRole === 'patient' ? 'doctor' : 'patient', 'name profilePhoto')
+    .populate('lastMessage', 'content sender createdAt'); 
 
     return chats;
   }
