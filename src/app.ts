@@ -69,13 +69,13 @@ io.on('connection', (socket) => {
   });
 
   // Listen for a typing event
-  socket.on('typing', (chatId) => {
-    socket.to(chatId).emit('typing', socket.id); // Broadcast "typing" event to the room
+  socket.on('typing', (chatId) => {    
+    socket.to(chatId).emit('typing', chatId); // Broadcast "typing" event to the room
   });
 
   // Listen for a stopTyping event
-  socket.on('stopTyping', (chatId) => {
-    socket.to(chatId).emit('stopTyping', socket.id); // Broadcast "stopTyping" event to the room
+  socket.on('stopTyping', (chatId) => {    
+    socket.to(chatId).emit('stopTyping', chatId); // Broadcast "stopTyping" event to the room
   });
 
   // Listen for a message from the client
