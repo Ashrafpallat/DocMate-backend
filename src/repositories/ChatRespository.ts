@@ -78,14 +78,22 @@ class ChatRepository {
     return message
   }
   async getMessages(chatId: string) {
+    // Fetch messages and update their 'read' status to true
     const messages = await Message.find({ chatId })
       .populate({
         path: "sender",
         select: "name profilePhoto", 
       });
   
+    // Update all unread messages to read
+    await Message.updateMany(
+      { chatId, read: false }, // Only update unread messages
+      { $set: { read: true } } // Set read field to true
+    );
+  
     return messages;
   }
+  
   async getUnreadMessageCount(userId: string, chatId: string) {
       const unreadCount = await Message.countDocuments({
         receiver: userId,
