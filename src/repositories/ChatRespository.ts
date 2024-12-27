@@ -86,8 +86,14 @@ class ChatRepository {
   
     return messages;
   }
-  
-
+  async getUnreadMessageCount(userId: string, chatId: string) {
+      const unreadCount = await Message.countDocuments({
+        receiver: userId,
+        chatId: chatId,
+        read: false,
+      });
+      return unreadCount;
+  }
 }
 
 export const chatRepository = new ChatRepository(); 

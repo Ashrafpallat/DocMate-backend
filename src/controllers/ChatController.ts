@@ -55,5 +55,18 @@ import { CustomRequest } from "../interfaces/customRequest";
       console.log('error fetching messages',error);
     }
   }
+  async getUnreadMessageCount(req: CustomRequest,res: Response){
+    try {
+      const userId = req.user?.userId
+      const chatId = req.params.chatId   
+      if(!userId || !chatId) {
+        throw new Error('UserId or ChatId is missing')
+      }
+      const unreadMessageCount = await chatService.getUnreadMessageCount(userId, chatId)
+      return res.status(200).json(unreadMessageCount)
+    } catch (error) {
+      console.log('error fetching unreadmessage count countroller',error);
+    }
+  }
 };
 export const chatController = new ChatController();

@@ -15,6 +15,9 @@ import { chatRepository } from "../repositories/ChatRespository";
   async getMessages(chatId: string){
     return await chatRepository.getMessages(chatId)
   }
+  async getUnreadMessageCount(userId:string,chatId:string ){
+    return await chatRepository.getUnreadMessageCount(userId, chatId)
+  }
 }; 
 
 export const chatService = new ChatService();
