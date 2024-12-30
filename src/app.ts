@@ -86,6 +86,12 @@ io.on('connection', (socket) => {
     socket.to(data.chatId).emit('receiveMessage', data);
   });
 
+  socket.on('video-call', (data) => {
+    const { chatId, videoCallUrl } = data;
+    // Broadcast the message to the specific chat room
+    socket.to(data.chatId).emit('receiveVideoCall', data);
+  });
+
   // Handle disconnection
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
