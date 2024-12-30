@@ -210,7 +210,22 @@ class PatientController {
   }
   async createPaymentSession(req: Request, res: Response) {
     const { doctorId, amount, day, slotIndex } = req.body;
-
+    if (!doctorId) {
+      throw new Error('Doctor ID is missing');
+    }
+    
+    if (!amount) {
+      throw new Error('Amount is missing');
+    }
+    
+    if (!day) {
+      throw new Error('Day is missing');
+    }
+    
+    if (slotIndex === null || slotIndex === undefined) {
+      throw new Error('Slot index is missing');
+    }
+    
     try {
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],

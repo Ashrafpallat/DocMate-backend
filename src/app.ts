@@ -21,7 +21,7 @@ app.use(cors({
   credentials: true // Allow credentials (cookies) to be sent
 }));
 app.use(express.json());
-
+ 
 app.use('/api/admin', adminRouter);
 app.use('/api/doctor', doctorRoutes);
 app.use('/api/patient', patientRoutes);
