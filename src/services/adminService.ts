@@ -36,6 +36,21 @@ class AdminService {
     // const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
     return adminRepository.updateDoctorStatus(doctorId, status);
   }
+  async getAllPrescriptions(){
+    return adminRepository.getAllPrescriptions()
+  }
+  async getPatientByMonth(year: number){
+    return adminRepository.getPatientsByMonth(year)
+  }
+  async getDoctorstByMonth(year: number){
+    return adminRepository.getDoctorsByMonth(year)
+  }
+  async getPatientByYear(year: number[]){
+    return adminRepository.getPatientsByYear(year)
+  }
+  async getDoctorByYear(year: number[]){
+    return adminRepository.getDoctorsByYear(year)
+  }
 }
 
 export const adminService = new AdminService();

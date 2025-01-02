@@ -63,7 +63,7 @@ class PatientController {
         location,
       });
 
-      return res.status(HttpStatus.CREATED).json({ message: Messages.Success.USER_REGISTERED, newPatient });
+      return res.status(HttpStatus.OK).json({ message: Messages.Success.USER_REGISTERED, newPatient });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
     }

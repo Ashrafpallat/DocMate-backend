@@ -14,6 +14,7 @@ class PatientRepository {
 
   async createPatient(patientData: any) {
     const patient = new Patient(patientData);
+    console.log('user created');
     return await patient.save();
   }
 

@@ -12,7 +12,7 @@ class AdminController {
       const { admin } = await adminService.loginAdmin(email, password);
       const accessToken = generateAccessToken({ userId: admin.userId, email: admin.email, name: admin.name }, res);
       const refreshToken = generateRefreshToken({ userId: admin.userId, email: admin.email, name: admin.name }, res);
-     
+
       return res.status(HttpStatus.OK).json({ message: Messages.Admin.LOGIN_SUCCESS, admin });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
@@ -117,6 +117,50 @@ class AdminController {
       res.status(200).json({ message: `Doctor ${updatedDoctor.status === 'Active' ? 'unblocked' : 'Blocked'} successfully`, doctor: updatedDoctor });
     } catch (error) {
       res.status(500).json({ message: Messages.Errors.FAILED_TO_UPDATE_DOCTOR_STATUS, error });
+    }
+  }
+  async getAllPresciptions(req: Request, res: Response) {
+    try {
+      const presciptions = await adminService.getAllPrescriptions()
+      res.status(200).json(presciptions);
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
+    }
+  }
+  async getPatientsByMonth(req: Request, res: Response) {
+    try {
+      const year = 2024
+      const patientsBymonth = await adminService.getPatientByMonth(year)
+      res.status(200).json(patientsBymonth);
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
+    }
+  }
+  async getDoctorsByMonth(req: Request, res: Response) {
+    try {
+      const year = 2024
+      const doctorsBymonth = await adminService.getDoctorstByMonth(year)
+      res.status(200).json(doctorsBymonth);
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
+    }
+  }
+  async getPatientsByYear(req: Request, res:Response){
+    try {
+      const years = [2024, 2025, 2026]
+      const patientsByYear = await adminService.getPatientByYear(years)
+      res.status(200).json(patientsByYear);
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
+    }
+  }
+  async getDoctorsByYear(req: Request, res:Response){
+    try {
+      const years = [2024, 2025, 2026]
+      const doctorsByYear = await adminService.getDoctorByYear(years)
+      res.status(200).json(doctorsByYear);
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.Errors.INTERNAL_SERVER_ERROR });
     }
   }
 }
