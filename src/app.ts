@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import doctorRoutes from './routes/doctorRoutes';
 import patientRoutes from './routes/patientRoutes';
-import chatRoutes from './routes/ChatRoutes';
+import chatRoutes from './routes/chatRoutes';
 import dotenv from 'dotenv';
 import cors from 'cors'
 import adminRouter from './routes/adminRoutes';
