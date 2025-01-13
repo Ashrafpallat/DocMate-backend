@@ -1,5 +1,5 @@
 import { IChat } from "../interfaces/ChatInterface";
-import { chatRepository } from "../repositories/ChatRespository";
+import { chatRepository } from "../repositories/chatRespository";
 
  class ChatService  {
   async getChatsForUser(userId: string, userRole: string): Promise<IChat[]> {

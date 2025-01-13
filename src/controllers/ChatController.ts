@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { CustomRequest } from "../interfaces/customRequest";
-import { chatService } from "../services/ChatService";
+import { chatService } from "../services/chatService";
 
 
  class ChatController {
