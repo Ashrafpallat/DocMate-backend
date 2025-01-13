@@ -1,0 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const adminController_1 = require("../controllers/adminController");
+const adminRouter = (0, express_1.Router)();
+// POST: http://localhost:5000/api/admin/login
+adminRouter.post('/login', adminController_1.adminController.login);
+adminRouter.get('/pending-verifications', adminController_1.adminController.getPendingVerifications);
+adminRouter.post('/pending-verifications/:id', adminController_1.adminController.approveVerification);
+adminRouter.get('/patients', adminController_1.adminController.getAllPatients);
+adminRouter.put('/patient/:patientId/status', adminController_1.adminController.updatePatientStatus);
+adminRouter.get('/doctors', adminController_1.adminController.getAllDoctors);
+adminRouter.put('/doctors/:doctorId/status', adminController_1.adminController.updateDoctorStatus);
+adminRouter.get('/getAllPrescriptions', adminController_1.adminController.getAllPresciptions);
+adminRouter.get('/getPatientsByMonth', adminController_1.adminController.getPatientsByMonth);
+adminRouter.get('/getDoctorsByMonth', adminController_1.adminController.getDoctorsByMonth);
+adminRouter.get('/getPatientsByYear', adminController_1.adminController.getPatientsByYear);
+adminRouter.get('/getDoctorsByYear', adminController_1.adminController.getDoctorsByYear);
+adminRouter.post('/logout', adminController_1.adminController.logout);
+exports.default = adminRouter;

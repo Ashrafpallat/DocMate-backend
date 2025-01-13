@@ -19,7 +19,7 @@ jspm_packages/
 .env
 
 # Build files
-dist/
+# dist/
 build/
 .tmp/
 
